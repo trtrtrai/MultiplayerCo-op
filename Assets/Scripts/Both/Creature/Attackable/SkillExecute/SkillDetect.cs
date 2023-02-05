@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
-    public class SkillDetect : MonoBehaviour
+    public class SkillDetect : NetworkBehaviour
     {
         [SerializeField] private IActiveDetect parent;
 

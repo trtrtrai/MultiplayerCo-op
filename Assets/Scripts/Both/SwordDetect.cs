@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class SwordDetect : SkillActive
 {
-    // Start is called before the first frame update
+   /* // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
         //Debug.Log("Sword Skill Start");
     }
-
+*/
     protected override void SpecializedBehaviour()
     {
         base.SpecializedBehaviour();

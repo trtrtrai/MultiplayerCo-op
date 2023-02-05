@@ -15,6 +15,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private Rigidbody2D player;
         [SerializeField] private PlayerControl control;
         [SerializeField] private Vector2 VectorSpeed;
+        [SerializeField] private Vector2 VectorState;
 
         public bool IsUpdateAnimation { get; set; }
         public Animator Animator => animator;
@@ -30,19 +31,20 @@ namespace Assets.Scripts.Both.Creature.Controllers
         void Start()
         {
             //init animation
+            VectorState = Vector2.one;
             IsUpdateAnimation = true;
             animator.SetInteger("orientation", 2);
         }
 
         private void FixedUpdate()
         {
-            if (!IsServer) return;
-
+            //if (!IsServer && !IsHost) return;
             if (control is null) return;
+            if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
 
             //Movement
             VectorSpeed = new Vector2(control.VectorAxis.Value.x * 250 * Time.fixedDeltaTime, control.VectorAxis.Value.y * 250 * Time.fixedDeltaTime);
-            player.velocity = VectorSpeed * control.VectorState.Value;
+            player.velocity = VectorSpeed * VectorState;
 
             if (!IsUpdateAnimation) return;
 
@@ -52,14 +54,14 @@ namespace Assets.Scripts.Both.Creature.Controllers
         #region Config movement direct
         public void MoveNonAffect()
         {
-            if (IsServer)
-                control.VectorState.Value = Vector2.one; //only server can change value
+            if (NetworkManager.LocalClientId == 0)
+                VectorState = Vector2.one; //only server can change value
         }
 
         public void Root()
         {
-            if (IsServer)
-                control.VectorState.Value = Vector2.zero; //only server can change value
+            if (NetworkManager.LocalClientId == 0)
+                VectorState = Vector2.zero; //only server can change value
         }
         #endregion
 
@@ -68,19 +70,9 @@ namespace Assets.Scripts.Both.Creature.Controllers
             creature.ActivateSkill(0, ResetAttack);
         }
 
-        private void ResetAttack()
-        {
-            control.AttackTrigger.Value = false;
-        }
-
         private void SpAttack()
         {
             creature.ActivateSkill(1, ResetSpAttack);
-        }
-
-        private void ResetSpAttack()
-        {
-            control.SpAttackTrigger.Value = false;
         }
 
         private void SpAttack2()
@@ -88,9 +80,37 @@ namespace Assets.Scripts.Both.Creature.Controllers
             creature.ActivateSkill(2, ResetSpAttack2);
         }
 
+        private void ResetAttack()
+        {
+            control.ResetAttackClientRpc(new ClientRpcParams()
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { control.OwnerClientId }
+                }
+            });
+        }
+
+        private void ResetSpAttack()
+        {
+            control.ResetSpAttackClientRpc(new ClientRpcParams()
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { control.OwnerClientId }
+                }
+            });
+        }
+
         private void ResetSpAttack2()
         {
-            control.SpAttackTrigger2.Value = false;
+            control.ResetSpAttack2ClientRpc(new ClientRpcParams()
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { control.OwnerClientId }
+                }
+            });
         }
 
         /// <summary>
@@ -109,7 +129,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         #region Add PlayerControl
         /// <summary>
-        /// Inject PLayerControl
+        /// Inject PLayerControl (Server call)
         /// </summary>
         /// <param name="ctrl"></param>
         public void AddControl(PlayerControl ctrl) 

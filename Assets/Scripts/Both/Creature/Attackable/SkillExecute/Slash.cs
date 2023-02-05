@@ -6,15 +6,13 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
     public class Slash : SkillActive
     {
-        protected override void Start()
+        public override void SetupSkill()
         {
-            base.Start();
+            base.SetupSkill();
             //Debug.Log("Sword Skill Start");
 
             var objs = GetComponentsInChildren<Collider2D>();
             if (objs.Length == 0) return;
-
-            objs.ToList().ForEach(o => o.gameObject.AddComponent<SkillDetect>());
         }
 
         protected override void SpecializedBehaviour()
@@ -40,6 +38,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         public override void SkillTagExecuteCollider2d(GameObject obj)
         {
+            if (!IsOwner) return;
             if (obj.tag.Equals("Boss") || obj.tag.Equals("Enemy"))
             {
                 Debug.Log("Slash dame " + obj.tag);

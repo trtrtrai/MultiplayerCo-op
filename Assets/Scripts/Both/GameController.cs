@@ -1,15 +1,20 @@
 using Assets.Scripts.Both.Creature;
 using Assets.Scripts.Both.Creature.Attackable;
+using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
 using Assets.Scripts.Both.Creature.Controllers;
 using Assets.Scripts.Both.Creature.Player;
 using Assets.Scripts.Both.Scriptable;
 using Assets.Scripts.Server.Contruction;
 using Assets.Scripts.Server.Contruction.Builders;
+using System.Collections.Generic;
 using System.IO;
+using System;
 using System.Linq;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
+using Assets.Scripts.Both.Creature.Status;
+using Assets.Scripts.Server.Creature.Attackable;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -30,9 +35,36 @@ public class GameController : NetworkBehaviour
         }
     }
 
-    //[ServerRpc(RequireOwnership = false)]
-    public void SpawnPlayer(ulong clientId)
+    public void BossSpawn(int index)
     {
+        if (!IsServer) return;
+
+        CreatureBuilder builder = new BossBuilder();
+        CreatureDirector.Instance.Builder = builder;
+        CreatureDirector.Instance.BossBuild(index);
+
+        var rs = builder.Release();
+
+        SpawnGameObject((rs as NetworkBehaviour).gameObject, true);
+
+        (rs as NetworkBehaviour).AddComponent<BossController>();
+
+        var skills = rs.GetSkills();
+        var skillActives = (rs as NetworkBehaviour).GetComponentsInChildren<SkillActive>();
+        for (int i = 0; i < skills.Count; i++)
+        {
+            skillActives[i].name = skills[i].SkillName.ToString();
+            skillActives[i].SetupSkill();
+        }
+
+        CreatureSpawnClientRpc(CreatureForm.Boss, index, (rs as NetworkBehaviour).NetworkObject);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnPlayerServerRpc(ulong clientId)
+    {
+        if (!IsServer) return;
+
         CreatureBuilder builder = new CharacterBuilder();
         CreatureDirector.Instance.Builder = builder;
         CreatureDirector.Instance.CharacterBuild(CharacterClass.TankerSlash_model);
@@ -42,12 +74,8 @@ public class GameController : NetworkBehaviour
 
         var control = InstantiateGameObject("Player/PlayerControl", null); //PLayer control (real owned by client)
 
-        playerTransform.AddComponent<PlayerController>().AddControl(control.GetComponent<PlayerControl>()); //Add control into controller
-
         //Spawn accross network
         SpawnAsPlayerObject(control, clientId, true);
-        control.GetComponent<PlayerControl>().enabled = false;
-        control.GetComponent<PlayerControl>().enabled = true;
         SpawnGameObject(playerTransform.gameObject);
 
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -58,14 +86,100 @@ public class GameController : NetworkBehaviour
             }
         };
 
+        //Listen in server
+        var scriptCtrl = control.GetComponent<PlayerControl>();
+        playerTransform.gameObject.AddComponent<PlayerController>().AddControl(scriptCtrl);
+        //scriptCtrl.StartListen();
+
+        if (clientId != NetworkManager.Singleton.LocalClientId) CreatureSpawnClientRpc(CreatureForm.Character, 0, (rs as NetworkBehaviour).NetworkObject);
+        //GameObject skil setup
+        var skills = rs.GetSkills();
+        var skillActives = playerTransform.GetComponentsInChildren<SkillActive>();
+        for (int i = 0; i < skills.Count; i++)
+        {
+            skillActives[i].name = skills[i].SkillName.ToString();
+            skillActives[i].SetupSkill();
+        }
+
         //Setup camera
         SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
     }
 
-    /*public void CastSpell(SkillName name, NetworkObject netRef)
+    public void Cast(List<SkillTag> skillTags, NetworkObjectReference netObjRef)
     {
-        Debug.Log("Cast " + name);
-    }*/
+        if (!IsServer) return;
+        netObjRef.TryGet(out NetworkObject netObj);
+        SkillBehaviour.Instance.Cast(skillTags, netObj);
+    }
+
+    [ClientRpc]
+    private void CreatureSpawnClientRpc(CreatureForm form, int indexName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient || IsHost) return;
+
+        //Load scriptable object
+        var script = GetCreatureModel(form, indexName);
+        creature.TryGet(out NetworkObject creatureObj);
+        ICreatureBuild builder = creatureObj.GetComponent<Creature>();
+
+        //Init property
+        builder.InitName(script.CreatureName);
+
+        var status = new List<Stats>();
+        script.Status.ForEach(i =>
+        {
+            var statsT = Type.GetType(i.Type.ToString());
+            if (statsT is null) return;
+
+            status.Add((Stats)Activator.CreateInstance(statsT, i.Amount));
+        });
+        builder.InitStatus(status);
+
+        var attackable = new Attackable();
+        attackable.TouchDamage = script.TouchDamage;
+        attackable.SkillSlot = script.SkillSlot;
+
+        //Instantiate skills
+        var skills = new List<Skill>()
+            {
+                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/BatSummon")),
+                /*new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
+                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),*/
+            };
+
+        attackable.Skills = skills;
+        builder.InitAttack(attackable);
+
+        var skillActives = creatureObj.GetComponentsInChildren<SkillActive>();
+        for (int i = 0; i < skills.Count; i++)
+        {
+            skillActives[i].name = skills[i].SkillName.ToString();
+            skillActives[i].SetupSkill();
+        }
+    }
+
+    private CreatureModel GetCreatureModel(CreatureForm form, int index)
+    {
+        CreatureModel model = null;
+
+        switch (form)
+        {
+            case CreatureForm.Character:
+                {
+                    model = Resources.Load<CharacterModel>("AssetObjects/Creatures/" + "Players/" + CharacterClass.TankerSlash_model.ToString());
+
+                    break;
+                }
+            case CreatureForm.Boss:
+                {
+                    model = Resources.Load<BossModel>("AssetObjects/Creatures/" + "Boss/" + "Treant");
+
+                    break;
+                }
+        }
+
+        return model;
+    }
 
     /// <summary>
     /// ClientRpc params only send to client ID targeted
@@ -76,6 +190,7 @@ public class GameController : NetworkBehaviour
     {
         if (IsClient)
         {
+            //Camera Follow
             var cmr = GameObject.FindGameObjectWithTag("MainCamera");
 
             if (cmr is null)
@@ -84,11 +199,17 @@ public class GameController : NetworkBehaviour
                 cmr.GetComponent<NetworkObject>().Spawn();
             }
 
-            //var player = GameObject.FindGameObjectsWithTag("Player").ToList().First((p) => p.GetComponent<NetworkObject>().OwnerClientId == NetworkManager.Singleton.LocalClientId).transform;
             var cmrFolow = cmr.GetComponent<CameraFollower>();
             player.TryGet(out NetworkObject playerObj);
             cmrFolow.Target = playerObj.transform;
             cmrFolow.StartFocus();
+
+            //Add control into controller - client
+            var control = GameObject.FindGameObjectsWithTag("Player").FirstOrDefault(c => c.GetComponent<NetworkObject>().IsOwner);
+            if (control is null) return;
+            var scriptCtrl = control.GetComponent<PlayerControl>();
+            //playerObj.GetComponent<PlayerController>().AddControl(scriptCtrl);
+            scriptCtrl.StartListen();
         }
     }
 
@@ -141,10 +262,5 @@ public class GameController : NetworkBehaviour
     public void SpawnWithOwnerShip()
     {
 
-    }
-
-    public GameObject FindGameObject(string name)
-    {
-        return GameObject.Find(name);
     }
 }

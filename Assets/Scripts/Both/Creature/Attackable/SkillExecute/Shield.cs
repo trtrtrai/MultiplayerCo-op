@@ -1,20 +1,19 @@
 using System.Collections;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
     public class Shield : SkillActive
     {
-        protected override void Start()
+        public override void SetupSkill()
         {
-            base.Start();
+            base.SetupSkill();
             //Debug.Log("Sword Skill Start");
 
             var objs = GetComponentsInChildren<Collider2D>();
             if (objs.Length == 0) return;
-
-            objs.ToList().ForEach(o => o.gameObject.AddComponent<SkillDetect>());
         }
 
         protected override void SpecializedBehaviour()
@@ -40,22 +39,14 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             owner.MoveNonAffect();
         }
 
-        public override void SkillTagExecuteCollider2d(GameObject obj)
-        {
-            if (obj is null) return;
-
-            if (obj.tag.Equals("Bullet"))
-            {
-                Destroy(obj);
-            }
-        }
-
         public override void SkillTagExecuteTrigger2d(GameObject obj)
         {
+            if (!IsOwner) return;
             if (obj is null) return;
 
             if (obj.tag.Equals("Bullet"))
             {
+                obj.GetComponent<NetworkObject>().Despawn();
                 Destroy(obj);
             }
         }

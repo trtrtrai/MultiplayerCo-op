@@ -1,5 +1,7 @@
 using Assets.Scripts.Both.Creature;
 using Assets.Scripts.Both.Creature.Player;
+using Assets.Scripts.Both.Scriptable;
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,7 +11,7 @@ namespace Assets.Scripts.Server.Contruction
     /// <summary>
     /// Server-side execute
     /// </summary>
-    public class CreatureFactory : MonoBehaviour
+    public class CreatureFactory : NetworkBehaviour
     {
         public static CreatureFactory Instance { get; private set; }
 
@@ -27,7 +29,7 @@ namespace Assets.Scripts.Server.Contruction
             }
         }
 
-        public ICreatureBuild CreateCreature(CreatureForm form)
+        public ICreatureBuild CreateCreature(CreatureForm form, string name)
         {
             Both.Creature.Creature creature = null;
             Transform obj;
@@ -36,13 +38,17 @@ namespace Assets.Scripts.Server.Contruction
             {
                 case CreatureForm.Character:
                     {
-                        obj = Instantiate(Resources.Load<GameObject>("Player/PlayerPrefab")).transform;
+                        obj = Instantiate(Resources.Load<GameObject>("Player/" + name)).transform;
 
-                        creature = obj.gameObject.AddComponent<Character>();   
+                        creature = obj.gameObject.GetComponent<Both.Creature.Creature>();   
                         break;
                     }
                 case CreatureForm.Boss:
                     {
+                        obj = Instantiate(Resources.Load<GameObject>("Boss/" + name + "/" + name)).transform;
+
+                        creature = obj.gameObject.GetComponent<Both.Creature.Creature>();
+
                         break;
                     }
             }

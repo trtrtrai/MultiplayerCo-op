@@ -9,7 +9,7 @@ namespace Assets.Scripts.Server.Contruction.Builders
     {
         protected ICreatureBuild creature = null;
 
-        public abstract void InstantiateGameObject();
+        public abstract void InstantiateGameObject(string name);
 
         public virtual void GiveName(string name)
         {

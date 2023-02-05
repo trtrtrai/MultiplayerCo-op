@@ -4,11 +4,12 @@ using Assets.Scripts.Both.Scriptable;
 using Assets.Scripts.Server.Contruction.Builders;
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Contruction
 {
-    public class CreatureDirector : MonoBehaviour
+    public class CreatureDirector : NetworkBehaviour
     {
         public static CreatureDirector Instance { get; private set; }
 
@@ -32,7 +33,7 @@ namespace Assets.Scripts.Server.Contruction
         public void CharacterBuild(CharacterClass charClass)
         {
             //Game Object
-            builder.InstantiateGameObject();
+            builder.InstantiateGameObject(charClass.ToString());
 
             //Load scriptable object
             var script = Resources.Load<CharacterModel>(path + "Players/" + charClass.ToString());
@@ -55,9 +56,6 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            builder.AttachGameObject("SkillBehave/Slash", "Slash");
-            builder.AttachGameObject("SkillBehave/Shield", "Shield");
-            builder.AttachGameObject("SkillBehave/SkillNormal", "FireBall");
             var skills = new List<Skill>()
             {
                 new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Slash")),
@@ -65,6 +63,43 @@ namespace Assets.Scripts.Server.Contruction
                 new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),
             };
             //skills.ForEach(s => s.AddListener(GameController.Instance.CastSpell));
+
+            attackable.Skills = skills;
+            builder.GiveAttackable(attackable);
+        }
+
+        public void BossBuild(int num)
+        {
+            //Game Object
+            builder.InstantiateGameObject("Treant");
+
+            //Load scriptable object
+            var script = Resources.Load<BossModel>(path + "Boss/Treant");
+
+            //Init property
+            builder.GiveName(script.CreatureName);
+
+            var status = new List<Stats>();
+            script.Status.ForEach(i =>
+            {
+                var statsT = Type.GetType(i.Type.ToString());
+                if (statsT is null) return;
+
+                status.Add((Stats)Activator.CreateInstance(statsT, i.Amount));
+            });
+            builder.GiveStatus(status);
+
+            var attackable = new Attackable();
+            attackable.TouchDamage = script.TouchDamage;
+            attackable.SkillSlot = script.SkillSlot;
+
+            //Instantiate skills
+            var skills = new List<Skill>()
+            {
+                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/BatSummon")),
+                /*new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
+                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),*/
+            };
 
             attackable.Skills = skills;
             builder.GiveAttackable(attackable);

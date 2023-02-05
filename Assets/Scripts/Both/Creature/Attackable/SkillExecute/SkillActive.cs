@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
-    public class SkillActive : MonoBehaviour, IActiveDetect
+    public class SkillActive : NetworkBehaviour, IActiveDetect
     {
         [SerializeField] protected ICreatureController owner;
         [SerializeField] protected ISkill creatureSkill;
@@ -18,21 +18,19 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         [SerializeField] protected bool canActive;
         [SerializeField] protected float timer;
 
-        // Start is called before the first frame update
-        protected virtual void Start()
+        public virtual void SetupSkill()
         {
             //Debug.Log("SkillActive Start");
-            //var ownerObj = FindObjectsOfType<Creature>().ToList().FirstOrDefault(t => t.GetComponent<NetworkObject>().NetworkObjectId.ToString() == gameObject.transform.parent.name);
-            owner = gameObject.transform.parent.GetComponent<ICreatureController>(); //ownerObj.GetComponent<ICreatureController>();
-
-            if (owner is null)
+            if (IsOwner)
             {
-                //Debug.Log("Skill's owner is missing!");
-                //Destroy
-                gameObject.SetActive(false);
+                owner = gameObject.transform.parent.GetComponent<ICreatureController>();
+                creatureSkill = (owner as NetworkBehaviour).GetComponent<ICreature>().GetSkills().FirstOrDefault(i => i.SkillName.ToString().Equals(gameObject.name));
             }
-
-            creatureSkill = (owner as NetworkBehaviour).GetComponent<ICreature>().GetSkills().FirstOrDefault(i => i.SkillName.ToString().Equals(gameObject.name));
+            else
+            {
+                var creature = gameObject.transform.parent.GetComponent<ICreature>();
+                creatureSkill = creature.GetSkills().FirstOrDefault(i => i.SkillName.ToString().Equals(gameObject.name));
+            }
 
             skillTags = Resources.Load<SkillModel>("AssetObjects/Skills/" + creatureSkill.SkillName.ToString()).SkillTags;
             creatureSkill.AddListener(ActivateSkill);
@@ -74,7 +72,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         private void SkillTagExecute()
         {
             // maybe call to GameController
-            SkillBehaviour.Instance.Cast(skillTags);
+            GameController.Instance.Cast(skillTags, (owner as NetworkBehaviour).NetworkObject);
         }
 
         private void ResetSkill()

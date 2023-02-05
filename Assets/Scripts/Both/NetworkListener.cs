@@ -85,13 +85,15 @@ namespace Assets.Scripts.Both
                                 var gameCtroller = Instantiate(Resources.Load<GameObject>("Manager/GameController"));
                                 GameController.Instance.SpawnGameObject(gameCtroller, true);
 
-                                GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
-                                GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
-                                GameController.Instance.InstantiateGameObject("Manager/CreatureSkill", null).name = "CreatureSkill";
-
+                                var creatureContruct = GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
+                                GameController.Instance.SpawnGameObject(creatureContruct, true);
+                                var skillBehaviour = GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
+                                //GameController.Instance.SpawnGameObject(skillBehaviour, true);
+                                GameController.Instance.BossSpawn(0);
                                 if (NetworkManager.Singleton.IsHost)
                                 {
                                     Debug.Log("Server is also host");
+                                    GameController.Instance.SpawnPlayerServerRpc(sceneEvent.ClientId);
                                 }
                             }
                             else
@@ -99,13 +101,13 @@ namespace Assets.Scripts.Both
                                 // Handle client LoadComplete **server-side** notifications here
                                 Debug.Log("Server side client load " + sceneEvent.ClientId + " completed");
                             }
-
-                            GameController.Instance.SpawnPlayer(sceneEvent.ClientId);
                         }
                         else // Clients generate this notification locally
                         {
                             // Handle client side LoadComplete related tasks here
                             Debug.Log("Client load " + sceneEvent.ClientId + " completed");
+
+                            StartCoroutine(Wait(sceneEvent.ClientId));
                         }
 
                         // So you can use sceneEvent.ClientId to also track when clients are finished loading a scene
@@ -162,6 +164,16 @@ namespace Assets.Scripts.Both
                         break;
                     }
             }
+        }
+
+        private IEnumerator Wait(ulong clientId)
+        {
+            while (GameController.Instance is null)
+            {
+                yield return null;
+            }
+
+            GameController.Instance.SpawnPlayerServerRpc(clientId);
         }
     }
 }
