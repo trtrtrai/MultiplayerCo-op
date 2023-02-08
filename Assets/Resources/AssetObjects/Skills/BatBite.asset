@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
-  m_Name: Slash
+  m_Name: BatBite
   m_EditorClassIdentifier: 
-  SkillName: 3
-  Description: Normal attack of Slash Tanker.
-  CastDelay: 0
-  Cooldown: 1.25
+  SkillName: 5
+  Description: A bite of a bat.
+  CastDelay: 0.3
+  Cooldown: 3.5
   SkillTags:
   - Tag: 0
     Attack: 0
     Effect: 0
     Special: 0
-    Duration: 0.5
-    EffectNumber: 0
-    AddOrMultiple: 0
+    Duration: 0.3
+    EffectNumber: 1.25
+    AddOrMultiple: 1
     StatsType: 0
     Place: 0
-    Distance: 0
+    SummonCreature: 

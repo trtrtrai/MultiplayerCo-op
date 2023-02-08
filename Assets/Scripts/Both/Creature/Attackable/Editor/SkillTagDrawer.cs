@@ -58,12 +58,24 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                 line++;
             }
 
-            EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Duration"))),
+            if (index == 0 || index == 1)
+            {
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Duration"))),
                 property.FindPropertyRelative("Duration"));
-            line++;
-            EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("EffectNumber"))),
-                property.FindPropertyRelative("EffectNumber"));
-            line++;
+                line++;
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("EffectNumber"))),
+                    property.FindPropertyRelative("EffectNumber"));
+                line++;
+            }
+            else
+            {
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Place"))),
+                property.FindPropertyRelative("Place"));
+                line++;
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonCreature"))),
+                    property.FindPropertyRelative("SummonCreature"));
+                line++;
+            }
 
             // Set indent back to what it was
             EditorGUI.indentLevel = indent;

@@ -1,14 +1,12 @@
 using Assets.Scripts.Both.Creature.Attackable;
-using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Controllers
 {
-    public class BossController : NetworkBehaviour, ICreatureController
+    public class EnemyController : NetworkBehaviour, ICreatureController
     {
         private ICreature creature;
         [SerializeField] private Animator animator;
@@ -27,6 +25,14 @@ namespace Assets.Scripts.Both.Creature.Controllers
             creature = GetComponent<Creature>();
         }
 
+        void Start()
+        {
+            skills = creature.GetSkills();
+            timer = 0;
+            //init animation
+            IsUpdateAnimation = true;
+        }
+
         public void MoveNonAffect()
         {
             //throw new System.NotImplementedException();
@@ -37,26 +43,9 @@ namespace Assets.Scripts.Both.Creature.Controllers
             //throw new System.NotImplementedException();
         }
 
-        // Start is called before the first frame update
-        void Start()
+        private void FixedUpdate()
         {
-            skills = creature.GetSkills();
-            timer = 0;
-            //init animation
-            IsUpdateAnimation = true;
-            //animator.SetInteger("orientation", 2);
-        }
-
-        // Update is called once per frame
-        void FixedUpdate()
-        {
-            if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
-
-            if (target is null)
-            {
-                var p = GameObject.FindGameObjectWithTag("Character");
-                target = p.transform ?? null;
-            }
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             if (timer > 0)
             {

@@ -16,6 +16,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private PlayerControl control;
         [SerializeField] private Vector2 VectorSpeed;
         [SerializeField] private Vector2 VectorState;
+        [SerializeField] private float speed;
 
         public bool IsUpdateAnimation { get; set; }
         public Animator Animator => animator;
@@ -25,6 +26,15 @@ namespace Assets.Scripts.Both.Creature.Controllers
             animator = GetComponent<Animator>();
             player = GetComponent<Rigidbody2D>();
             creature = GetComponent<Creature>();
+
+            var spdStats = creature.GetStats(Scriptable.StatsType.Speed);
+            speed = spdStats.GetValue();
+            spdStats.OnStatsChange += SpdStats_OnStatsChange;
+        }
+
+        private void SpdStats_OnStatsChange(object sender, Status.StatsChangeEventArgs e)
+        {
+            speed = e.NewValue;
         }
 
         // Start is called before the first frame update
@@ -43,7 +53,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
 
             //Movement
-            VectorSpeed = new Vector2(control.VectorAxis.Value.x * 250 * Time.fixedDeltaTime, control.VectorAxis.Value.y * 250 * Time.fixedDeltaTime);
+            VectorSpeed = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
             player.velocity = VectorSpeed * VectorState;
 
             if (!IsUpdateAnimation) return;
@@ -67,17 +77,17 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Attack()
         {
-            creature.ActivateSkill(0, ResetAttack);
+            creature.ActivateSkill(0, ResetAttack, GetComponent<Creature>());
         }
 
         private void SpAttack()
         {
-            creature.ActivateSkill(1, ResetSpAttack);
+            creature.ActivateSkill(1, ResetSpAttack, GetComponent<Creature>());
         }
 
         private void SpAttack2()
         {
-            creature.ActivateSkill(2, ResetSpAttack2);
+            creature.ActivateSkill(2, ResetSpAttack2, GetComponent<Creature>());
         }
 
         private void ResetAttack()

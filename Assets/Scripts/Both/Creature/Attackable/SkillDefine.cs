@@ -7,6 +7,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         BatSummon,
         Slash,
         Shield,
+        BatBite
     }
 
     public enum TagType
@@ -37,5 +38,11 @@ namespace Assets.Scripts.Both.Creature.Attackable
         Summon,
         Teleport,
         Immortal,
+    }
+
+    public enum SummonPlace
+    {
+        Position,
+        Target,
     }
 }

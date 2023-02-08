@@ -18,6 +18,8 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         [SerializeField] protected bool canActive;
         [SerializeField] protected float timer;
 
+        protected SkillPackageEventArg current;
+
         public virtual void SetupSkill()
         {
             //Debug.Log("SkillActive Start");
@@ -37,10 +39,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             ResetSkill();
         }
 
-        protected virtual void ActivateSkill(Action callback, NetworkObject owner)
+        protected virtual void ActivateSkill(Action callback, SkillPackageEventArg args)
         {
             if (!canActive) return;
 
+            current = args;
             canActive = false;
             StartCoroutine(DelayActive(callback));
         }
@@ -72,7 +75,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         private void SkillTagExecute()
         {
             // maybe call to GameController
-            GameController.Instance.Cast(skillTags, (owner as NetworkBehaviour).NetworkObject);
+            GameController.Instance.Cast(skillTags, current);
         }
 
         private void ResetSkill()

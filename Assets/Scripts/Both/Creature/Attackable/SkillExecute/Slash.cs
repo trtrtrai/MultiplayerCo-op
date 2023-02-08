@@ -19,7 +19,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         {
             owner.IsUpdateAnimation = false;
 
-            base.SpecializedBehaviour();
+            //base.SpecializedBehaviour();
 
             StartCoroutine(SlashDuration());
             var orien = owner.Animator.GetInteger("orientation");

@@ -51,6 +51,14 @@ namespace Assets.Scripts.Server.Contruction
 
                         break;
                     }
+                case CreatureForm.Other:
+                    {
+                        obj = Instantiate(Resources.Load<GameObject>("OtherCreature/" + name + "/" + name)).transform;
+
+                        creature = obj.gameObject.GetComponent<Both.Creature.Creature>();
+
+                        break;
+                    }
             }
 
             if (creature != null) IdentifyCreature(creature);

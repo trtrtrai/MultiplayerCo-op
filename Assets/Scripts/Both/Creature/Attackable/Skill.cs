@@ -27,22 +27,22 @@ namespace Assets.Scripts.Both.Creature.Attackable
             cooldown = model.Cooldown;
         }
 
-        public void Activate(Action callback, Creature owner)
+        public void Activate(Action callback, Creature owner, Creature target)
         {
-            OnActivate?.Invoke(callback, owner.GetComponent<NetworkObject>());
+            OnActivate?.Invoke(callback, new SkillPackageEventArg(owner.GetComponent<NetworkObject>(), target.GetComponent<NetworkObject>(), new Vector3(0.2f, 0.2f)));
         }
 
-        public void AddListener(Action<Action, NetworkObject> subscriber)
-        {
-            OnActivate += subscriber;
-        }
-
-        public void RemoveListener(Action<Action, NetworkObject> subscriber)
+        public void AddListener(Action<Action, SkillPackageEventArg> subscriber)
         {
             OnActivate += subscriber;
         }
 
-        public Action<Action, NetworkObject> OnActivate;
+        public void RemoveListener(Action<Action, SkillPackageEventArg> subscriber)
+        {
+            OnActivate += subscriber;
+        }
+
+        public Action<Action, SkillPackageEventArg> OnActivate;
     }
 
     public interface ISkill
@@ -51,12 +51,26 @@ namespace Assets.Scripts.Both.Creature.Attackable
         float CastDelay { get; }
         float Cooldown { get; }
         string Description { get; }
-        void AddListener(Action<Action, NetworkObject> subscriber);
-        void RemoveListener(Action<Action, NetworkObject> subscriber);
+        void AddListener(Action<Action, SkillPackageEventArg> subscriber);
+        void RemoveListener(Action<Action, SkillPackageEventArg> subscriber);
     }
 
     public interface ISkillActivate
     {
-        void Activate(Action callback, Creature owner);
+        void Activate(Action callback, Creature owner, Creature target);
+    }
+
+    public class SkillPackageEventArg : EventArgs
+    {
+        public readonly NetworkObject Caster;
+        public readonly NetworkObject Target;
+        public readonly Vector3 CastPlace;
+
+        public SkillPackageEventArg(NetworkObject caster, NetworkObject target, Vector3 castPlace)
+        {
+            Caster = caster;
+            Target = target;
+            CastPlace = castPlace;
+        }
     }
 }

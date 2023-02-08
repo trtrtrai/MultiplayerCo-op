@@ -1,8 +1,9 @@
 using Assets.Scripts.Both.Creature;
 using Assets.Scripts.Both.Creature.Attackable;
 using Assets.Scripts.Both.DynamicObject;
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Creature.Attackable
@@ -23,14 +24,14 @@ namespace Assets.Scripts.Server.Creature.Attackable
             }
         }
 
-        public void Cast(List<SkillTag> tags, NetworkObject caster)
+        public void Cast(List<SkillTag> tags, SkillPackageEventArg args)
         {
             tags.ForEach(t => { 
                 switch (t.Tag)
                 {
                     case TagType.Attack:
                         {
-                            AttackTypeBehaviour(t, caster);
+                            AttackTypeBehaviour(t, args);
                             
                             return;
                         }
@@ -40,7 +41,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         }
                     case TagType.Special:
                         {
-                            SpecialTypeBehaviour(t, caster);
+                            SpecialTypeBehaviour(t, args);
 
                             return;
                         }
@@ -48,21 +49,39 @@ namespace Assets.Scripts.Server.Creature.Attackable
             });
         }
 
-        private void AttackTypeBehaviour(SkillTag tag, NetworkObject caster)
+        private void AttackTypeBehaviour(SkillTag tag, SkillPackageEventArg args)
         {
             if (tag.Tag != TagType.Attack) return;
-            ICreature creature = caster.GetComponent<ICreature>();
+            ICreature creature = args.Caster.GetComponent<ICreature>();
             if (creature is null) return;
 
-            switch (tag.Attack) // except AttackTag.Normal
+            switch (tag.Attack)
             {
+                case AttackTag.Normal:
+                    {
+                        var anim = args.Caster.GetComponent<Animator>();
+                        try
+                        {
+                            anim.SetBool("isAttack", true);
+                            StartCoroutine(Wait(tag.Duration, () => anim.SetBool("isAttack", false)));
+                        }
+                        catch
+                        {
+
+                        }
+
+                        break;
+                    }
                 case AttackTag.Bullet:
                     {
-                        //if (!IsClient) return;
                         var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/Bullet"));
-                        bullet.transform.localPosition = (creature as NetworkBehaviour).transform.localPosition;
+                        bullet.tag = args.Caster.tag;
+
+                        var direction = GetSkillDirection(args.Caster.GetComponent<Animator>());
+                        bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
+                        //Debug.Log(bullet.transform.localPosition);
                         IBulletInitial script = bullet.GetComponent<Bullet>();
-                        script.InjectBulletInfo(100, GetSkillDirection(caster.GetComponent<Animator>()), 175f);
+                        script.InjectBulletInfo(100, direction, 175f);
 
                         GameController.Instance.SpawnGameObject(bullet, true);
                         break;
@@ -78,21 +97,34 @@ namespace Assets.Scripts.Server.Creature.Attackable
             }
         }
 
-        private void SpecialTypeBehaviour(SkillTag tag, NetworkObject caster)
+        private void SpecialTypeBehaviour(SkillTag tag, SkillPackageEventArg args)
         {
             if (tag.Tag != TagType.Special) return;
-            ICreature creature = caster.GetComponent<ICreature>();
-            if (creature is null) return;
+            ICreature creature = args.Caster.GetComponent<ICreature>();
+            if (creature is null) return; //Caster dead?
 
-            switch (tag.Special) // except AttackTag.Normal
+            switch (tag.Special)
             {
                 case SpecialTag.Summon:
                     {
-                        //if (!IsClient) return;
-                        var critter = Instantiate(Resources.Load<GameObject>("OtherCreature/Bat/Bat"));
-                        critter.transform.localPosition = (creature as NetworkBehaviour).transform.localPosition;
-                        //IBulletInitial script = bullet.GetComponent<Bullet>();
-                        //script.InjectBulletInfo(100, GetSkillDirection(caster.GetComponent<Animator>()), 175f);
+                        var critter = GameController.Instance.CreatureInstantiate(tag.SummonCreature, GetCreatureTag(args.Caster.tag));
+                        critter.tag = GetCreatureTag(args.Caster.tag);
+
+                        switch (tag.Place)
+                        {
+                            case SummonPlace.Position:
+                                {
+                                    critter.transform.localPosition = args.Caster.transform.localPosition;
+                                    break;
+                                }
+                            case SummonPlace.Target:
+                                {
+                                    if (args.Target is null) return;
+
+                                    critter.transform.localPosition = args.Target.transform.localPosition;
+                                    break;
+                                }
+                        }
 
                         GameController.Instance.SpawnGameObject(critter, true);
                         break;
@@ -133,6 +165,42 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         return Vector2.zero;
                     }
             }
+        }
+
+        private string GetCreatureTag(string casterTag)
+        {
+            switch (casterTag)
+            {
+                case "Character":
+                    {
+                        return "Ally";
+                    }
+                case "Boss":
+                    {
+                        return "Enemy";
+                    }
+                case "Mobs":
+                    {
+                        return "Mobs";
+                    }
+                case "Enemy":
+                    {
+                        return "Enemy";
+                    }
+                case "Ally":
+                    {
+                        return "Ally";
+                    }
+            }
+
+            return "Mobs";
+        } //for summon creature
+
+        private IEnumerator Wait(float time, Action callback)
+        {
+            yield return new WaitForSeconds(time);
+
+            callback();
         }
     }
 }

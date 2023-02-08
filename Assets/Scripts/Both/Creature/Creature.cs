@@ -24,12 +24,9 @@ namespace Assets.Scripts.Both.Creature
 
         public virtual IStats GetStats(StatsType type)
         {
-            var statsType = Type.GetType(type.ToString());
-            if (statsType is null) return null;
-
             for (int i = 0; i < status.Count; i++)
             {
-                if (status[i].GetType().Name == statsType.ToString())
+                if (status[i].GetType().Name == type.ToString())
                 {
                     return status[i];
                 }
@@ -43,11 +40,11 @@ namespace Assets.Scripts.Both.Creature
             return attackable.Skills.Select(s => (ISkill)s).ToList();
         }
 
-        public bool ActivateSkill(int index, Action callback)
+        public bool ActivateSkill(int index, Action callback, Creature target)
         {
             ISkillActivate skill = attackable.Skills[index];
 
-            skill.Activate(callback, this); //this func will return bool after
+            skill.Activate(callback, this, target); //this func will return bool after
             return true;
         }
 
@@ -72,9 +69,10 @@ namespace Assets.Scripts.Both.Creature
     {
         Character,
         Boss,
-        Enemy,
+        Other,
+        /*Enemy,
         Mobs,
-        Ally
+        Ally*/
     }
 
     public interface ICreatureBuild
@@ -93,6 +91,6 @@ namespace Assets.Scripts.Both.Creature
 
         IStats GetStats(StatsType type);
         public List<ISkill> GetSkills();
-        public bool ActivateSkill(int index, Action callback);
+        public bool ActivateSkill(int index, Action callback, Creature target);
     }
 }

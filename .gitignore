@@ -79,3 +79,6 @@ crashlytics-build.properties
 # DCMA
 /[Aa]ssets/GUIPack-CleanMinimalist/
 /[Aa]ssets/Gif/
+/[Aa]ssets/Spriter2UnityDX/
+/[Aa]ssets/Resources/Boss/
+/[Aa]ssets/Resources/OtherCreature/

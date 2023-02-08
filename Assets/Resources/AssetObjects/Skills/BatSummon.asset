@@ -25,3 +25,5 @@ MonoBehaviour:
     EffectNumber: 0
     AddOrMultiple: 0
     StatsType: 0
+    Place: 1
+    SummonCreature: Bat

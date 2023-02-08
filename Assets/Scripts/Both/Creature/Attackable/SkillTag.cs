@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Scriptable;
+using System.Numerics;
 
 namespace Assets.Scripts.Both.Creature.Attackable 
 {
@@ -26,5 +27,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         public StatsType StatsType;
 
         // Special tag
+        public SummonPlace Place; // Summon
+        public string SummonCreature;
     }
 }

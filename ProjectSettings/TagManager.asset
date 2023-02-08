@@ -10,6 +10,9 @@ TagManager:
   - Skill
   - Boss
   - Enemy
+  - Character
+  - Ally
+  - Mobs
   layers:
   - Default
   - TransparentFX

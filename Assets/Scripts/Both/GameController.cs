@@ -35,6 +35,29 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    public GameObject CreatureInstantiate(string name, string behaviour)
+    {
+        if (!IsServer) return null;
+
+        CreatureBuilder builder = new OtherCreatureBuilder();
+        CreatureDirector.Instance.Builder = builder;
+        CreatureDirector.Instance.OtherBuild(name);
+
+        var rs = builder.Release();
+
+        (rs as NetworkBehaviour).AddComponent<EnemyController>(); //...
+
+        var skills = rs.GetSkills();
+        var skillActives = (rs as NetworkBehaviour).GetComponentsInChildren<SkillActive>();
+        for (int i = 0; i < skills.Count; i++)
+        {
+            skillActives[i].name = skills[i].SkillName.ToString();
+            skillActives[i].SetupSkill();
+        }
+
+        return (rs as NetworkBehaviour).gameObject;
+    }
+
     public void BossSpawn(int index)
     {
         if (!IsServer) return;
@@ -105,11 +128,11 @@ public class GameController : NetworkBehaviour
         SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
     }
 
-    public void Cast(List<SkillTag> skillTags, NetworkObjectReference netObjRef)
+    public void Cast(List<SkillTag> skillTags, SkillPackageEventArg args)
     {
         if (!IsServer) return;
-        netObjRef.TryGet(out NetworkObject netObj);
-        SkillBehaviour.Instance.Cast(skillTags, netObj);
+
+        SkillBehaviour.Instance.Cast(skillTags, args);
     }
 
     [ClientRpc]
@@ -128,7 +151,7 @@ public class GameController : NetworkBehaviour
         var status = new List<Stats>();
         script.Status.ForEach(i =>
         {
-            var statsT = Type.GetType(i.Type.ToString());
+            var statsT = Type.GetType("Assets.Scripts.Both.Creature.Status." + i.Type.ToString());
             if (statsT is null) return;
 
             status.Add((Stats)Activator.CreateInstance(statsT, i.Amount));
@@ -166,13 +189,19 @@ public class GameController : NetworkBehaviour
         {
             case CreatureForm.Character:
                 {
-                    model = Resources.Load<CharacterModel>("AssetObjects/Creatures/" + "Players/" + CharacterClass.TankerSlash_model.ToString());
+                    model = Resources.Load<CharacterModel>("AssetObjects/Creatures/" + "Player/" + CharacterClass.TankerSlash_model.ToString());
 
                     break;
                 }
             case CreatureForm.Boss:
                 {
                     model = Resources.Load<BossModel>("AssetObjects/Creatures/" + "Boss/" + "Treant");
+
+                    break;
+                }
+            case CreatureForm.Other:
+                {
+                    model = Resources.Load<OtherCreatureModel>("AssetObjects/Creatures/" + "Bat/Bat");
 
                     break;
                 }
