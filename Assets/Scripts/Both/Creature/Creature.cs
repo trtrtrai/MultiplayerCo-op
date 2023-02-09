@@ -57,12 +57,19 @@ namespace Assets.Scripts.Both.Creature
         public virtual void InitStatus(List<Stats> status)
         {
             this.status = status;
+
+            this.status.ForEach(s =>
+            {
+                s.OnStatsChange += (o, a) => { StatsChange?.Invoke(this, a); };
+            });
         }
 
         public virtual void InitAttack(Attackable.Attackable attackable)
         {
             this.attackable = attackable;
         }
+
+        public event Action<object, StatsChangeEventArgs> StatsChange;
     }
 
     public enum CreatureForm

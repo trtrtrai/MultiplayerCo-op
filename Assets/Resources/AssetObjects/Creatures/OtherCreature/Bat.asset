@@ -15,7 +15,7 @@ MonoBehaviour:
   CreatureName: Bat
   Status:
   - Type: 0
-    Amount: 100
+    Amount: 50
   - Type: 1
     Amount: 20
   - Type: 2

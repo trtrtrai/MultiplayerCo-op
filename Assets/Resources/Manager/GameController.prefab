@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7807522957329336774}
   - component: {fileID: 7807522957329336769}
   - component: {fileID: -3521153727192499190}
+  - component: {fileID: -2759984557310573953}
   m_Layer: 0
   m_Name: GameController
   m_TagString: GameController
@@ -61,3 +62,15 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &-2759984557310573953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7807522957329336775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 779523965f3d5ee40bad2e514a8440a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

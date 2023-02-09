@@ -135,6 +135,11 @@ public class GameController : NetworkBehaviour
         SkillBehaviour.Instance.Cast(skillTags, args);
     }
 
+    public void Damage(ICreature target, ICreature attacker, int damage)
+    {
+        DamageCalculate.Instance.DamageTo(target, damage);
+    }
+
     [ClientRpc]
     private void CreatureSpawnClientRpc(CreatureForm form, int indexName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
     {

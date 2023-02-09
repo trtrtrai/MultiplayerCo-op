@@ -41,9 +41,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             if (!IsOwner) return;
             if (obj.tag.Equals("Boss") || obj.tag.Equals("Enemy"))
             {
-                Debug.Log("Slash dame " + obj.tag);
 
                 //send to execute skill tag place
+                ICreature attacker = GetComponentInParent<Creature>();
+                //Debug.Log("Slash dame" + attacker.GetStats(Scriptable.StatsType.Strength).GetValue() + " " + obj.tag);
+                GameController.Instance.Damage(obj.GetComponent<Creature>(), attacker, attacker.GetStats(Scriptable.StatsType.Strength).GetValue());
             }
         }
     }

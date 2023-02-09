@@ -1,3 +1,4 @@
+using Assets.Scripts.Both.Scriptable;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace Assets.Scripts.Both.Creature.Status
                 if (n == old) return;
 
                 current = n;
-                OnStatsChange?.Invoke(this, new StatsChangeEventArgs(old + Temporary, current + Temporary));
+                OnStatsChange?.Invoke(this, new StatsChangeEventArgs(GetType(), old + Temporary, current + Temporary));
             }
         }
 
@@ -46,13 +47,13 @@ namespace Assets.Scripts.Both.Creature.Status
                 {
                     temporary = -Current;
                     //StartCoroutine(ResetTemporary(temporary, temporaryReset));
-                    OnStatsChange?.Invoke(this, new StatsChangeEventArgs(old + Current, temporary + Current));
+                    OnStatsChange?.Invoke(this, new StatsChangeEventArgs(GetType(), old + Current, temporary + Current));
                     return;
                 }
 
                 temporary = value;
                 //StartCoroutine(ResetTemporary(temporary, temporaryReset));
-                OnStatsChange?.Invoke(this, new StatsChangeEventArgs(old + Current, temporary + Current));
+                OnStatsChange?.Invoke(this, new StatsChangeEventArgs(GetType(), old + Current, temporary + Current));
             }
         }
 
@@ -91,11 +92,13 @@ namespace Assets.Scripts.Both.Creature.Status
 
     public class StatsChangeEventArgs : EventArgs
     {
+        public readonly Type Type;
         public readonly int OldValue;
         public readonly int NewValue;
 
-        public StatsChangeEventArgs(int oldValue, int newValue)
+        public StatsChangeEventArgs(Type type, int oldValue, int newValue)
         {
+            Type = type;
             OldValue = oldValue;
             NewValue = newValue;
         }
