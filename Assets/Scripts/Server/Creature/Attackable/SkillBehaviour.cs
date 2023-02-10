@@ -4,6 +4,9 @@ using Assets.Scripts.Both.DynamicObject;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Creature.Attackable
@@ -37,6 +40,8 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         }
                     case TagType.Effect:
                         {
+                            EffectTypeBehaviour(t, args);
+
                             return;
                         }
                     case TagType.Special:
@@ -47,6 +52,24 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         }
                 }
             });
+        }
+
+        private void EffectTypeBehaviour(SkillTag tag, SkillPackageEventArg args)
+        {
+            if (tag.Tag != TagType.Effect) return;
+            ICreature creature = args.Caster.GetComponent<ICreature>();
+            if (creature is null) return;
+            var cont = (creature as NetworkBehaviour).GetComponentsInChildren<Transform>().ToListPooled().FirstOrDefault(o => o.name.Equals("TempContainer"));
+            switch (tag.Effect)
+            {
+                case EffectTag.Add:
+                    {
+                        var obj = Instantiate(Resources.Load<GameObject>("DynamicObject/StatsTemp"), cont);
+                        obj.AddComponent<TemporaryStats>().Setup(creature, tag.StatsType, (int)tag.EffectNumber, tag.Duration);
+
+                        break;
+                    }
+            }
         }
 
         private void AttackTypeBehaviour(SkillTag tag, SkillPackageEventArg args)
@@ -63,7 +86,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         try
                         {
                             anim.SetBool("isAttack", true);
-                            StartCoroutine(Wait(tag.Duration, () => anim.SetBool("isAttack", false)));
+                            StartCoroutine(Wait(tag.Duration, () => { if (anim != null) anim.SetBool("isAttack", false); }));
                         }
                         catch
                         {
@@ -201,6 +224,11 @@ namespace Assets.Scripts.Server.Creature.Attackable
             yield return new WaitForSeconds(time);
 
             callback();
+        }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
         }
     }
 }

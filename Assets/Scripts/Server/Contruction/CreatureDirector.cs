@@ -60,7 +60,7 @@ namespace Assets.Scripts.Server.Contruction
             {
                 new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Slash")),
                 new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),
+                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Ragnarok")),
             };
 
             attackable.Skills = skills;

@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
-    public class Shield : SkillActive
+    public class Shield : SkillActive, IActiveDetect
     {
         public override void SetupSkill()
         {
@@ -14,6 +15,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
             var objs = GetComponentsInChildren<Collider2D>();
             if (objs.Length == 0) return;
+
+            for (int i = 0; i < objs.Length; i++)
+            {
+                objs[i].AddComponent<SkillDetect>().Setup(this);
+            }
         }
 
         protected override void SpecializedBehaviour()
@@ -49,6 +55,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
                 obj.GetComponent<NetworkObject>().Despawn();
                 Destroy(obj);
             }
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
         }
     }
 }

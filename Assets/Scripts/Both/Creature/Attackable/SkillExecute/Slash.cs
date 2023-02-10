@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
-    public class Slash : SkillActive
+    public class Slash : SkillActive, IActiveDetect
     {
         public override void SetupSkill()
         {
@@ -13,6 +14,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
             var objs = GetComponentsInChildren<Collider2D>();
             if (objs.Length == 0) return;
+
+            for (int i = 0; i < objs.Length; i++)
+            {
+                objs[i].AddComponent<SkillDetect>().Setup(this);
+            }
         }
 
         protected override void SpecializedBehaviour()
@@ -47,6 +53,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
                 //Debug.Log("Slash dame" + attacker.GetStats(Scriptable.StatsType.Strength).GetValue() + " " + obj.tag);
                 GameController.Instance.Damage(obj.GetComponent<Creature>(), attacker, attacker.GetStats(Scriptable.StatsType.Strength).GetValue());
             }
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
         }
     }
 }

@@ -7,7 +7,6 @@ using Assets.Scripts.Both.Scriptable;
 using Assets.Scripts.Server.Contruction;
 using Assets.Scripts.Server.Contruction.Builders;
 using System.Collections.Generic;
-using System.IO;
 using System;
 using System.Linq;
 using Unity.Netcode;
@@ -282,6 +281,13 @@ public class GameController : NetworkBehaviour
         if (gameObj.TryGetComponent(typeof(NetworkObject), out var netObj))
         {
             (netObj as NetworkObject).Spawn(destroyWithScene);
+
+            if (netObj.GetComponent<Creature>() != null)
+            {
+                var netS = netObj.GetComponentInChildren<NetworkStats>();
+                netS.Health.Value = netObj.GetComponent<Creature>().GetStats(StatsType.Health).GetValue();
+                netS.Setup();
+            }
         }
     }
 

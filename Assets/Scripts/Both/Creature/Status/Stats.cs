@@ -11,7 +11,6 @@ namespace Assets.Scripts.Both.Creature.Status
         [SerializeField] private int current;
         [SerializeField] private int max;
         [SerializeField] private int temporary;
-        private float temporaryReset;
 
         protected int Current 
         { 
@@ -46,13 +45,13 @@ namespace Assets.Scripts.Both.Creature.Status
                 if (value + Current < 0) //negative stats
                 {
                     temporary = -Current;
-                    //StartCoroutine(ResetTemporary(temporary, temporaryReset));
+
                     OnStatsChange?.Invoke(this, new StatsChangeEventArgs(GetType(), old + Current, temporary + Current));
                     return;
                 }
 
                 temporary = value;
-                //StartCoroutine(ResetTemporary(temporary, temporaryReset));
+
                 OnStatsChange?.Invoke(this, new StatsChangeEventArgs(GetType(), old + Current, temporary + Current));
             }
         }
@@ -74,17 +73,9 @@ namespace Assets.Scripts.Both.Creature.Status
             Current += addValue;
         }
 
-        public void SetTemporary(int addValue, float secs)
+        public void SetTemporary(int addValue)
         {
-            temporaryReset = secs;
             Temporary += addValue;
-        }
-
-        private IEnumerator ResetTemporary(int reset, float secs)
-        {
-            yield return new WaitForSecondsRealtime(secs);
-
-            temporary -= reset;
         }
 
         public event EventHandler<StatsChangeEventArgs> OnStatsChange;
@@ -108,7 +99,7 @@ namespace Assets.Scripts.Both.Creature.Status
     {
         int GetValue(bool current = true);
         void SetValue(int addValue);
-        void SetTemporary(int addValue, float secs);
+        void SetTemporary(int addValue);
 
         event EventHandler<StatsChangeEventArgs> OnStatsChange;
     }

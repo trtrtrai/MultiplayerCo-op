@@ -175,5 +175,10 @@ namespace Assets.Scripts.Both
 
             GameController.Instance.SpawnPlayerServerRpc(clientId);
         }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+        }
     }
 }

@@ -84,13 +84,10 @@ namespace Assets.Scripts.Server.Contruction
 
         private void CreatureFactory_StatsChange(object arg1, StatsChangeEventArgs arg2)
         {
-            Debug.Log(arg1 is null);
             if (arg1 is null) return;
-            Debug.Log(arg2.Type.Name + "=Health? " + arg2.Type.Name.Equals(StatsType.Health.ToString()) + " " + arg2.NewValue);
+            
             if (arg2.Type.Name.Equals(StatsType.Health.ToString()) && arg2.NewValue <= 0)
             {
-                Debug.Log((arg1 as ICreature).Name + " dead");
-
                 (arg1 as Both.Creature.Creature).NetworkObject.Despawn();
                 Destroy((arg1 as Both.Creature.Creature).gameObject);
             }

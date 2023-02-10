@@ -7,17 +7,16 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
     {
         [SerializeField] private IActiveDetect parent;
 
-        private void Start()
+        public void Setup(IActiveDetect skill)
         {
-            var rs = gameObject.transform.parent.TryGetComponent(out parent); //not get -> inject
-            //Debug.Log(rs);
+            parent = skill;
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject is null) return;
 
-            Debug.Log(collision.gameObject.name);
+            //Debug.Log(collision.gameObject.name);
 
             parent.SkillTagExecuteCollider2d(collision.gameObject);
         }
@@ -26,7 +25,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         {
             if (collision.gameObject is null) return;
 
-            Debug.Log(collision.gameObject.name);
+            //Debug.Log(collision.gameObject.name);
 
             parent.SkillTagExecuteTrigger2d(collision.gameObject);
         }

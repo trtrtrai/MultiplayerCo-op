@@ -26,6 +26,8 @@ MonoBehaviour:
     EffectNumber: 25
     AddOrMultiple: 0
     StatsType: 1
+    Place: 0
+    SummonCreature: 
   - Tag: 1
     Attack: 0
     Effect: 0
@@ -34,11 +36,15 @@ MonoBehaviour:
     EffectNumber: 15
     AddOrMultiple: 0
     StatsType: 2
+    Place: 0
+    SummonCreature: 
   - Tag: 1
     Attack: 0
     Effect: 0
     Special: 0
     Duration: 3.5
-    EffectNumber: 3
+    EffectNumber: 150
     AddOrMultiple: 0
     StatsType: 3
+    Place: 0
+    SummonCreature: 

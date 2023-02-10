@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 {
-    public class SkillActive : NetworkBehaviour, IActiveDetect
+    public class SkillActive : NetworkBehaviour
     {
         [SerializeField] protected ICreatureController owner;
         [SerializeField] protected ISkill creatureSkill;
@@ -76,6 +76,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         {
             // maybe call to GameController
             GameController.Instance.Cast(skillTags, current);
+            current = null;
         }
 
         private void ResetSkill()
@@ -97,6 +98,12 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         public virtual void SkillTagExecuteTrigger2d(GameObject obj)
         {
             
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            StopAllCoroutines();
         }
     }
 
