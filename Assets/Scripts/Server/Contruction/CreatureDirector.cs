@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Creature.Attackable;
+using Assets.Scripts.Both.Creature.Boss;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
 using Assets.Scripts.Server.Contruction.Builders;
@@ -56,18 +57,16 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            var skills = new List<Skill>()
-            {
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Slash")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Ragnarok")),
-            };
+            var skillName = GameController.Instance.GetCreatureSkill(charClass.ToString());
+            var skills = new List<Skill>();
+
+            skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));
 
             attackable.Skills = skills;
             builder.GiveAttackable(attackable);
         }
 
-        public void BossBuild(int num)
+        public void BossBuild(BossName boss)
         {
             //Game Object
             builder.InstantiateGameObject("Treant");
@@ -94,24 +93,22 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            var skills = new List<Skill>()
-            {
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/BatSummon")),
-                /*new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),*/
-            };
+            var skillName = GameController.Instance.GetCreatureSkill(boss.ToString());
+            var skills = new List<Skill>();
+
+            skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));
 
             attackable.Skills = skills;
             builder.GiveAttackable(attackable);
         }
 
-        public void OtherBuild(string name)
+        public void OtherBuild(string cName)
         {
             //Game Object
-            builder.InstantiateGameObject(name);
+            builder.InstantiateGameObject(cName);
 
             //Load scriptable object
-            var script = Resources.Load<OtherCreatureModel>(path + "OtherCreature/" + name);
+            var script = Resources.Load<OtherCreatureModel>(path + "OtherCreature/" + cName);
 
             //Init property
             builder.GiveName(script.CreatureName);
@@ -131,12 +128,10 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            var skills = new List<Skill>()
-            {
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/BatBite")),
-                /*new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),*/
-            };
+            var skillName = GameController.Instance.GetCreatureSkill(cName);
+            var skills = new List<Skill>();
+
+            skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));
 
             attackable.Skills = skills;
             builder.GiveAttackable(attackable);

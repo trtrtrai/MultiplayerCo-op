@@ -1,3 +1,4 @@
+using Assets.Scripts.Both.Scriptable;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,7 +90,7 @@ namespace Assets.Scripts.Both
                                 GameController.Instance.SpawnGameObject(creatureContruct, true);
                                 var skillBehaviour = GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
                                 //GameController.Instance.SpawnGameObject(skillBehaviour, true);
-                                GameController.Instance.BossSpawn(0);
+                                GameController.Instance.BossSpawn(BossName.Treant);
                                 if (NetworkManager.Singleton.IsHost)
                                 {
                                     Debug.Log("Server is also host");

@@ -14,6 +14,8 @@ using UnityEngine;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Server.Creature.Attackable;
 using Unity.VisualScripting;
+using Newtonsoft.Json;
+using System.IO;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -21,6 +23,8 @@ using Unity.VisualScripting;
 public class GameController : NetworkBehaviour
 {
     public static GameController Instance { get; private set; }
+
+    private Dictionary<string, List<SkillName>> skillDict;
 
     private void Awake()
     {
@@ -31,10 +35,36 @@ public class GameController : NetworkBehaviour
         else
         {
             Instance = this;
+
+            if (skillDict != null) return;
+
+            JsonSerializer serializer = new JsonSerializer();
+            using (StreamReader sReader = new StreamReader(Application.streamingAssetsPath + "/CreatureSkill.txt"))
+            using (JsonReader jReader = new JsonTextReader(sReader))
+            {
+                Dictionary<string, List<string>> data;
+                data = serializer.Deserialize<Dictionary<string, List<string>>>(jReader);
+                if (data is null) return;
+
+                skillDict = new Dictionary<string, List<SkillName>>();
+                foreach (var item in data)
+                {
+                    var listSkill = new List<SkillName>();
+                    try
+                    {
+                        item.Value.ForEach(s => listSkill.Add((SkillName)Enum.Parse(typeof(SkillName), s)));
+                        skillDict.Add(item.Key, listSkill);
+                    }
+                    catch
+                    {
+                        //...
+                    }
+                }
+            }
         }
     }
 
-    public GameObject CreatureInstantiate(string name, string behaviour)
+    public GameObject CreatureInstantiate(string name)
     {
         if (!IsServer) return null;
 
@@ -44,42 +74,22 @@ public class GameController : NetworkBehaviour
 
         var rs = builder.Release();
 
-        (rs as NetworkBehaviour).AddComponent<EnemyController>(); //...
-
-        var skills = rs.GetSkills();
-        var skillActives = (rs as NetworkBehaviour).GetComponentsInChildren<SkillActive>();
-        for (int i = 0; i < skills.Count; i++)
-        {
-            skillActives[i].name = skills[i].SkillName.ToString();
-            skillActives[i].SetupSkill();
-        }
-
         return (rs as NetworkBehaviour).gameObject;
     }
 
-    public void BossSpawn(int index)
+    public void BossSpawn(BossName boss)
     {
         if (!IsServer) return;
 
         CreatureBuilder builder = new BossBuilder();
         CreatureDirector.Instance.Builder = builder;
-        CreatureDirector.Instance.BossBuild(index);
+        CreatureDirector.Instance.BossBuild(boss);
 
         var rs = builder.Release();
 
-        SpawnGameObject((rs as NetworkBehaviour).gameObject, true);
+        SpawnCreature(rs as Creature, "Boss", true);
 
-        (rs as NetworkBehaviour).AddComponent<BossController>();
-
-        var skills = rs.GetSkills();
-        var skillActives = (rs as NetworkBehaviour).GetComponentsInChildren<SkillActive>();
-        for (int i = 0; i < skills.Count; i++)
-        {
-            skillActives[i].name = skills[i].SkillName.ToString();
-            skillActives[i].SetupSkill();
-        }
-
-        CreatureSpawnClientRpc(CreatureForm.Boss, index, (rs as NetworkBehaviour).NetworkObject);
+        CreatureSpawnClientRpc(CreatureForm.Boss, BossName.Treant.ToString(), (rs as NetworkBehaviour).NetworkObject);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -97,9 +107,16 @@ public class GameController : NetworkBehaviour
         var control = InstantiateGameObject("Player/PlayerControl", null); //PLayer control (real owned by client)
 
         //Spawn accross network
-        SpawnAsPlayerObject(control, clientId, true);
-        SpawnGameObject(playerTransform.gameObject);
+        SpawnAsPlayerObject(control, clientId);
+        SpawnCreature(rs as Creature, "Character");
 
+        //Listen in server
+        var scriptCtrl = control.GetComponent<PlayerControl>();
+        playerTransform.gameObject.GetComponent<PlayerController>().AddControl(scriptCtrl);
+
+        CreatureSpawnClientRpc(CreatureForm.Character, CharacterClass.TankerSlash_model.ToString(), (rs as NetworkBehaviour).NetworkObject);
+
+        //Setup camera
         ClientRpcParams clientRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams
@@ -107,23 +124,6 @@ public class GameController : NetworkBehaviour
                 TargetClientIds = new ulong[] { clientId }
             }
         };
-
-        //Listen in server
-        var scriptCtrl = control.GetComponent<PlayerControl>();
-        playerTransform.gameObject.AddComponent<PlayerController>().AddControl(scriptCtrl);
-        //scriptCtrl.StartListen();
-
-        if (clientId != NetworkManager.Singleton.LocalClientId) CreatureSpawnClientRpc(CreatureForm.Character, 0, (rs as NetworkBehaviour).NetworkObject);
-        //GameObject skil setup
-        var skills = rs.GetSkills();
-        var skillActives = playerTransform.GetComponentsInChildren<SkillActive>();
-        for (int i = 0; i < skills.Count; i++)
-        {
-            skillActives[i].name = skills[i].SkillName.ToString();
-            skillActives[i].SetupSkill();
-        }
-
-        //Setup camera
         SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
     }
 
@@ -140,12 +140,12 @@ public class GameController : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void CreatureSpawnClientRpc(CreatureForm form, int indexName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
+    private void CreatureSpawnClientRpc(CreatureForm form, string cName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient || IsHost) return;
 
         //Load scriptable object
-        var script = GetCreatureModel(form, indexName);
+        var script = GetCreatureModel(form, cName);
         creature.TryGet(out NetworkObject creatureObj);
         ICreatureBuild builder = creatureObj.GetComponent<Creature>();
 
@@ -167,25 +167,69 @@ public class GameController : NetworkBehaviour
         attackable.SkillSlot = script.SkillSlot;
 
         //Instantiate skills
-        var skills = new List<Skill>()
-            {
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/BatSummon")),
-                /*new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/Shield")),
-                new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/FireBall")),*/
-            };
+        var skillName = GetCreatureSkill(cName);
+        var skills = new List<Skill>();
+
+        skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));
 
         attackable.Skills = skills;
         builder.InitAttack(attackable);
 
-        var skillActives = creatureObj.GetComponentsInChildren<SkillActive>();
+        CreatureSetup(builder as Creature, creatureObj.tag);
+    }
+
+    /// <summary>
+    /// Setup creature after spawn
+    /// </summary>
+    private void CreatureSetup(Creature obj, string tag)
+    {
+        if (!IsServer || obj is null) return;
+
+        switch (tag)
+        {
+            case "Character":
+                {
+                    obj.AddComponent<PlayerController>();
+                    break;
+                }
+            case "Boss":
+                {
+                    obj.AddComponent<BossController>();
+                    break;
+                }
+            case "Enemy":
+                {
+                    obj.AddComponent<EnemyController>();
+                    break;
+                }
+            case "Ally":
+                {
+
+                    break;
+                }
+            case "Mobs":
+                {
+
+                    break;
+                }
+        }
+
+        //Setup skill
+        var skills = obj.GetSkills();
+        var skillActives = obj.GetComponentsInChildren<SkillActive>();
         for (int i = 0; i < skills.Count; i++)
         {
             skillActives[i].name = skills[i].SkillName.ToString();
             skillActives[i].SetupSkill();
         }
+
+        //Setup NetworkVariable (Status + Healthbar)
+        var netS = obj.GetComponentInChildren<NetworkStats>();
+        netS.Health.Value = obj.GetStats(StatsType.Health).GetValue();
+        netS.Setup();
     }
 
-    private CreatureModel GetCreatureModel(CreatureForm form, int index)
+    private CreatureModel GetCreatureModel(CreatureForm form, string cName)
     {
         CreatureModel model = null;
 
@@ -193,19 +237,19 @@ public class GameController : NetworkBehaviour
         {
             case CreatureForm.Character:
                 {
-                    model = Resources.Load<CharacterModel>("AssetObjects/Creatures/" + "Player/" + CharacterClass.TankerSlash_model.ToString());
+                    model = Resources.Load<CharacterModel>("AssetObjects/Creatures/" + "Player/" + cName);
 
                     break;
                 }
             case CreatureForm.Boss:
                 {
-                    model = Resources.Load<BossModel>("AssetObjects/Creatures/" + "Boss/" + "Treant");
+                    model = Resources.Load<BossModel>("AssetObjects/Creatures/" + "Boss/" + cName);
 
                     break;
                 }
             case CreatureForm.Other:
                 {
-                    model = Resources.Load<OtherCreatureModel>("AssetObjects/Creatures/" + "Bat/Bat");
+                    model = Resources.Load<OtherCreatureModel>("AssetObjects/Creatures/" + cName + "/" + cName);
 
                     break;
                 }
@@ -246,6 +290,8 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    public List<SkillName> GetCreatureSkill(string name) => skillDict.ContainsKey(name) ? skillDict[name] : null;
+
     public GameObject InstantiateGameObject(string path, Transform parent)
     {
         if (parent)
@@ -276,18 +322,25 @@ public class GameController : NetworkBehaviour
         return obj;
     }
 
+    public void SpawnCreature(Creature creatureObj, string tag, bool destroyWithScene = false)
+    {
+        if (!IsServer && creatureObj is null) return;
+        
+        if (creatureObj.gameObject.TryGetComponent(typeof(NetworkObject), out var netObj))
+        {
+            (netObj as NetworkObject).Spawn(destroyWithScene);
+
+            CreatureSetup(creatureObj, tag);
+
+            CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, creatureObj.NetworkObject);
+        }
+    }
+
     public void SpawnGameObject(GameObject gameObj, bool destroyWithScene = false)
     {
         if (gameObj.TryGetComponent(typeof(NetworkObject), out var netObj))
         {
             (netObj as NetworkObject).Spawn(destroyWithScene);
-
-            if (netObj.GetComponent<Creature>() != null)
-            {
-                var netS = netObj.GetComponentInChildren<NetworkStats>();
-                netS.Health.Value = netObj.GetComponent<Creature>().GetStats(StatsType.Health).GetValue();
-                netS.Setup();
-            }
         }
     }
 

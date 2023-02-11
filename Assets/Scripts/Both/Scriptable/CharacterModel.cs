@@ -17,4 +17,11 @@ namespace Assets.Scripts.Both.Scriptable
         MagicianSummon_model,
         PriestHealing_model,
     }
+
+    public enum BossName
+    {
+        Treant,
+        Yeti,
+        Golem,
+    }
 }

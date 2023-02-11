@@ -130,7 +130,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
             {
                 case SpecialTag.Summon:
                     {
-                        var critter = GameController.Instance.CreatureInstantiate(tag.SummonCreature, GetCreatureTag(args.Caster.tag));
+                        var critter = GameController.Instance.CreatureInstantiate(tag.SummonCreature);
                         critter.tag = GetCreatureTag(args.Caster.tag);
 
                         switch (tag.Place)
@@ -149,7 +149,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                                 }
                         }
 
-                        GameController.Instance.SpawnGameObject(critter, true);
+                        GameController.Instance.SpawnCreature(critter.GetComponent<Both.Creature.Creature>(), critter.tag, true);
                         break;
                     }
                 case SpecialTag.Teleport:

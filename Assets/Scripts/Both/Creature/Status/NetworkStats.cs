@@ -46,7 +46,7 @@ namespace Assets.Scripts.Both.Creature.Status
 
         private void HealthSliderChange(int oV, int nV)
         {
-            Debug.Log(oV + " " + maxHp);
+            //Debug.Log(oV + " " + maxHp);
             healthSlider.value = 1.0f * nV / maxHp;
         }
 
