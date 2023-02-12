@@ -44,7 +44,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         }
 
         private void FixedUpdate()
-        {
+        {      
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             if (timer > 0)

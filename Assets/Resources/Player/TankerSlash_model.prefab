@@ -399,14 +399,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6907008513036568108, guid: 24c883f19cd71d14c94830b27f49093b, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6907008513036568108, guid: 24c883f19cd71d14c94830b27f49093b, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7155239979400696501, guid: 24c883f19cd71d14c94830b27f49093b, type: 3}
       propertyPath: m_Name
       value: NetworkStats

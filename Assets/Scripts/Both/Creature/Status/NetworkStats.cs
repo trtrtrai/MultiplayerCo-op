@@ -14,32 +14,36 @@ namespace Assets.Scripts.Both.Creature.Status
         public NetworkVariable<int> Speed = new NetworkVariable<int>();
         public NetworkVariable<int> CriticalHit = new NetworkVariable<int>();
 
-        private int maxHp;
-        /*private int maxStr;
-        private int maxDef;
-        private int maxSpd;
-        private int maxCrH;*/
-        private Slider healthSlider;
+        public NetworkVariable<int> MaxHealth = new NetworkVariable<int>();
+        public NetworkVariable<int> MaxStrength = new NetworkVariable<int>();
+        public NetworkVariable<int> MaxDefense = new NetworkVariable<int>();
+        public NetworkVariable<int> MaxSpeed = new NetworkVariable<int>();
+        public NetworkVariable<int> MaxCriticalHit = new NetworkVariable<int>();
+        private HealthColorManage healthSlider;
 
         public void Setup()
         {
-            healthSlider = GetComponentInChildren<Slider>();
+            healthSlider = GetComponentInChildren<HealthColorManage>();
 
             var parent = gameObject.transform.parent.GetComponent<Creature>();
             if (parent is null) return;
 
             if (IsServer)
             {
-                /*Health = new NetworkVariable<int>(parent.GetStats(StatsType.Health).GetValue());
+                /*Health.Value = parent.GetStats(StatsType.Health).GetValue();
                 Strength = new NetworkVariable<int>(parent.GetStats(StatsType.Strength).GetValue());
                 Defense = new NetworkVariable<int>(parent.GetStats(StatsType.Defense).GetValue());
                 Speed = new NetworkVariable<int>(parent.GetStats(StatsType.Speed).GetValue());
-                CriticalHit = new NetworkVariable<int>(parent.GetStats(StatsType.CriticalHit).GetValue());*/
+                CriticalHit = new NetworkVariable<int>(parent.GetStats(StatsType.CriticalHit).GetValue());
 
+                MaxHealth.Value = parent.GetStats(StatsType.Health).GetValue(false);
+                MaxStrength.Value = parent.GetStats(StatsType.Strength).GetValue(false);
+                MaxDefense.Value = parent.GetStats(StatsType.Defense).GetValue(false);
+                MaxSpeed.Value = parent.GetStats(StatsType.Speed).GetValue(false);
+                MaxCriticalHit.Value = parent.GetStats(StatsType.CriticalHit).GetValue(false);*/
                 parent.StatsChange += Parent_StatsChange;
             }
 
-            maxHp = parent.GetStats(StatsType.Health).GetValue(false);
             HealthSliderChange(0, Health.Value);
             Health.OnValueChanged += HealthSliderChange;
         }
@@ -47,7 +51,9 @@ namespace Assets.Scripts.Both.Creature.Status
         private void HealthSliderChange(int oV, int nV)
         {
             //Debug.Log(oV + " " + maxHp);
-            healthSlider.value = 1.0f * nV / maxHp;
+            var ratio = 1.0f * nV / MaxHealth.Value;
+            healthSlider.Fill.fillAmount = ratio;
+            healthSlider.SliderValueChange();
         }
 
         private void Parent_StatsChange(object sender, StatsChangeEventArgs args)

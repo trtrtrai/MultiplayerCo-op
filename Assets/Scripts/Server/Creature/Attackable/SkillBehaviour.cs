@@ -148,8 +148,8 @@ namespace Assets.Scripts.Server.Creature.Attackable
                                     break;
                                 }
                         }
-
-                        GameController.Instance.SpawnCreature(critter.GetComponent<Both.Creature.Creature>(), critter.tag, true);
+                        var script = critter.GetComponent<Both.Creature.Creature>();
+                        GameController.Instance.SpawnCreature(script, critter.tag, true);
                         break;
                     }
                 case SpecialTag.Teleport:

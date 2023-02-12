@@ -1,5 +1,5 @@
 {
-"TankerSlash_model":["Slash","Shield","Ragnarok"],
+"TankerSlash":["Slash","Shield","Ragnarok"],
 "Treant":["BatSummon"],
 "Bat":["BatBite"],
 

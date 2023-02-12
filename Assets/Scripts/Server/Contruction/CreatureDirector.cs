@@ -57,7 +57,7 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            var skillName = GameController.Instance.GetCreatureSkill(charClass.ToString());
+            var skillName = GameController.Instance.GetCreatureSkill(charClass.ToString().Replace("_model", ""));
             var skills = new List<Skill>();
 
             skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));
