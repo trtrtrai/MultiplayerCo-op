@@ -88,8 +88,13 @@ namespace Assets.Scripts.Both
 
                                 var creatureContruct = GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
                                 GameController.Instance.SpawnGameObject(creatureContruct, true);
-                                var skillBehaviour = GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
-                                //GameController.Instance.SpawnGameObject(skillBehaviour, true);
+
+                                GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
+                                GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);
+
+                                var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
+                                GameController.Instance.SpawnGameObject(cmr);
+
                                 GameController.Instance.BossSpawn(BossName.Treant);
                                 if (NetworkManager.Singleton.IsHost)
                                 {

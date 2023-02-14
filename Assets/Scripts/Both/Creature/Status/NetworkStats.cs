@@ -2,10 +2,6 @@ using Unity.Netcode;
 
 namespace Assets.Scripts.Both.Creature.Status
 {
-    using Scriptable;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     public class NetworkStats : NetworkBehaviour
     {
         public NetworkVariable<int> Health = new NetworkVariable<int>();
@@ -21,6 +17,8 @@ namespace Assets.Scripts.Both.Creature.Status
         public NetworkVariable<int> MaxCriticalHit = new NetworkVariable<int>();
         private HealthColorManage healthSlider;
 
+        public bool IsSetup = false;
+
         public void Setup()
         {
             healthSlider = GetComponentInChildren<HealthColorManage>();
@@ -30,17 +28,6 @@ namespace Assets.Scripts.Both.Creature.Status
 
             if (IsServer)
             {
-                /*Health.Value = parent.GetStats(StatsType.Health).GetValue();
-                Strength = new NetworkVariable<int>(parent.GetStats(StatsType.Strength).GetValue());
-                Defense = new NetworkVariable<int>(parent.GetStats(StatsType.Defense).GetValue());
-                Speed = new NetworkVariable<int>(parent.GetStats(StatsType.Speed).GetValue());
-                CriticalHit = new NetworkVariable<int>(parent.GetStats(StatsType.CriticalHit).GetValue());
-
-                MaxHealth.Value = parent.GetStats(StatsType.Health).GetValue(false);
-                MaxStrength.Value = parent.GetStats(StatsType.Strength).GetValue(false);
-                MaxDefense.Value = parent.GetStats(StatsType.Defense).GetValue(false);
-                MaxSpeed.Value = parent.GetStats(StatsType.Speed).GetValue(false);
-                MaxCriticalHit.Value = parent.GetStats(StatsType.CriticalHit).GetValue(false);*/
                 parent.StatsChange += Parent_StatsChange;
             }
 

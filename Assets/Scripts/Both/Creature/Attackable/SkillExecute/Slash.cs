@@ -49,9 +49,9 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             {
 
                 //send to execute skill tag place
-                ICreature attacker = GetComponentInParent<Creature>();
+                Creature attacker = GetComponentInParent<Creature>();
                 //Debug.Log("Slash dame" + attacker.GetStats(Scriptable.StatsType.Strength).GetValue() + " " + obj.tag);
-                GameController.Instance.Damage(obj.GetComponent<Creature>(), attacker, attacker.GetStats(Scriptable.StatsType.Strength).GetValue());
+                GameController.Instance.Damage(obj.GetComponent<Creature>(), attacker.NetworkObject, attacker.GetStats(Scriptable.StatsType.Strength).GetValue());
             }
         }
 

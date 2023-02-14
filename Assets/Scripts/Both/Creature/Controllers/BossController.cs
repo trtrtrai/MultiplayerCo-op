@@ -55,7 +55,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             if (target is null)
             {
                 var p = GameObject.FindGameObjectWithTag("Character");
-                target = p.transform ?? null;
+                target = p is null? null : p.transform;
             }
 
             if (timer > 0)

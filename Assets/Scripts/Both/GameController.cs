@@ -16,6 +16,7 @@ using Assets.Scripts.Server.Creature.Attackable;
 using Unity.VisualScripting;
 using Newtonsoft.Json;
 using System.IO;
+using Assets.Scripts.Server.Creature;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -130,9 +131,9 @@ public class GameController : NetworkBehaviour
         SkillBehaviour.Instance.Cast(skillTags, args);
     }
 
-    public void Damage(ICreature target, ICreature attacker, int damage)
+    public void Damage(ICreature target, NetworkObject attacker, int damage)
     {
-        DamageCalculate.Instance.DamageTo(target, damage);
+        DamageCalculate.Instance.DamageTo(target, attacker, damage);
     }
 
     [ClientRpc]
@@ -297,8 +298,19 @@ public class GameController : NetworkBehaviour
             var control = GameObject.FindGameObjectsWithTag("Player").FirstOrDefault(c => c.GetComponent<NetworkObject>().IsOwner);
             if (control is null) return;
             var scriptCtrl = control.GetComponent<PlayerControl>();
-            //playerObj.GetComponent<PlayerController>().AddControl(scriptCtrl);
             scriptCtrl.StartListen();
+
+            FindObjectsOfType(typeof(Creature)).ToList().ForEach(c => {
+                if (c is null) return;
+
+                var script = (c as Creature).GetComponentInChildren<NetworkStats>();
+                if (script != null && !script.IsSetup)
+                {
+                    script.Setup();
+                    script.IsSetup = true;
+                }
+            });
+            //Debug.Log(creatures.Length);
         }
     }
 

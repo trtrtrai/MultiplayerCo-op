@@ -88,10 +88,13 @@ namespace Assets.Scripts.Server.Contruction
             
             if (arg2.Type.Name.Equals(StatsType.Health.ToString()) && arg2.NewValue <= 0)
             {
+                var creature = arg1 as Both.Creature.Creature;
+
                 (arg1 as Both.Creature.Creature).NetworkObject.Despawn();
-                Destroy((arg1 as Both.Creature.Creature).gameObject);
+
+                if (creatures.Contains(creature)) creatures.Remove(creature);
+                Destroy(creature.gameObject);
             }
         }
-
     }
 }

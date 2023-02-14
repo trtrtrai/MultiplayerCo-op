@@ -23,7 +23,7 @@ public class HealthColorManage : MonoBehaviour
                 cb.normalColor = healthColor[i];
                 slider.colors = cb;*/
 
-                //fill.color = healthColor[i];
+                Fill.color = healthColor[i];
                 return;
             }
         }

@@ -1,5 +1,5 @@
 {
-"TankerSlash":["Slash","Shield","Ragnarok"],
+"TankerSlash":["Slash","Shield","FireBall"],
 "Treant":["BatSummon"],
 "Bat":["BatBite"],
 
