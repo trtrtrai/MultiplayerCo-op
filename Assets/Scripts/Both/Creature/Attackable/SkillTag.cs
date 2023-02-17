@@ -21,7 +21,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         public float EffectNumber; // number effect to calculation
 
         // Attack tag
-        public bool AddOrMultiple;
+        public bool AddOrMultiple; // true is multiple
 
         // Effect tag
         public StatsType StatsType;

@@ -2,6 +2,7 @@ using Assets.Scripts.Both.Creature;
 using Assets.Scripts.Both.DynamicObject;
 using Assets.Scripts.Both.Scriptable;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -24,18 +25,26 @@ namespace Assets.Scripts.Server.Creature
             }
         }
 
-        private List<Both.Creature.Creature> immunList;
-
         public void DamageTo(ICreature creature, NetworkObject attacker, int damage) // if attacker is destroyed -> cannot calc????
         {
+            if (creature is null || attacker is null) return;
+
+            var immuns = (creature as Both.Creature.Creature).GetComponents<ImmunStats>().ToList();
+            foreach (var item in immuns)
+            {
+                if (item.Type == StatsType.Health) return;
+            }
+
             if (attacker.tag.Equals("Bullet"))
             {
                 creature.GetStats(StatsType.Health).SetValue(-damage + (creature.GetStats(StatsType.Defense).GetValue() / 2));
+                //knockback??
             }
             else // attaker is Creature
             {
                 //Debug.Log(creature.GetStats(Assets.Scripts.Both.Scriptable.StatsType.Health).GetValue() + " " + damage);
                 var atker = attacker.GetComponent<ICreature>();
+                var atkerRigid = attacker.GetComponent<Rigidbody2D>();
 
                 //Crit change?
                 var rand = Random.Range(1, 101);
@@ -48,27 +57,25 @@ namespace Assets.Scripts.Server.Creature
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
 
                 creature.GetStats(StatsType.Health).SetValue(-damage);
-                (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, 10f, 0.5f);
+                (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, atkerRigid.mass*2, .75f);
             }         
         }
 
-        // Attack this code to creature (AddComponent)
-        /*public void PlayFeedback(GameObject sender)
+        public void TouchTo(ICreature creature, NetworkObject attacker, int damage)
         {
-            StopAllCoroutines();
-            OnBegin?.Invoke();
-            Vector2 direction = (transform.position - sender.transform.position).normalized;
-            var script = sender.GetComponent<ObjectDetectHit>();
-            if (script is null) rigid.AddForce(direction * strength, ForceMode2D.Impulse);
-            else rigid.AddForce(direction * (sender.transform.position.y < gameObject.transform.position.y ? script.Strength + 0.5f : script.Strength), ForceMode2D.Impulse);
-            StartCoroutine(Reset());
-        }
+            if (creature is null || attacker is null) return;
 
-        private IEnumerator Reset()
-        {
-            yield return new WaitForSeconds(delay);
-            rigid.velocity = Vector2.zero;
-            OnDone?.Invoke();
-        }*/
+            var immuns = (creature as Both.Creature.Creature).GetComponents<ImmunStats>().ToList();
+            foreach (var item in immuns)
+            {
+                if (item.Type == StatsType.Health) return;
+            }
+
+            /*//Defense reduce
+            damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;*/
+
+            creature.GetStats(StatsType.Health).SetValue(-damage);
+            (creature as Both.Creature.Creature).AddComponent<ImmunStats>().Setup(StatsType.Health, 0.5f);
+        }
     }
 }

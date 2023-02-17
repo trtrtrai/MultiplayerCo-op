@@ -1,7 +1,9 @@
 using Assets.Scripts.Both.Creature.Attackable;
 using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
+using Assets.Scripts.Both.DynamicObject;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -68,10 +70,33 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (target) targetCreature = target.GetComponent<Creature>();
                 else targetCreature = GetComponent<Creature>();
-                creature.ActivateSkill(0, () => { }, targetCreature);
+                
+                var place = FindSpawningPlace(targetCreature.transform);
+                var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creature.GetSkills()[0].SkillName, null);
+                skillObj.transform.localPosition = place.localPosition;
+                GameController.Instance.SpawnGameObject(skillObj, true);
+                skillObj.GetComponent<AutoDestroy>().Setup(3.5f);
 
+                creature.ActivateSkill(0, () => { }, place);
                 timer = skills[0].Cooldown;
             }
+        }
+
+        private Transform FindSpawningPlace(Transform targetCreature)
+        {
+            var objs = GameObject.FindGameObjectsWithTag("SpecialPoint").Select(o => o.transform);
+
+            List<float> distance = new List<float>();
+
+
+            for (int i = 0; i < objs.Count(); i++)
+            {
+                distance.Add((objs.ElementAt(i).localPosition - targetCreature.localPosition).magnitude);
+            }
+
+            if (distance.Count == 0) return objs.ElementAt(0);
+
+            return objs.ElementAt(distance.IndexOf(distance.Min()));
         }
     }
 }

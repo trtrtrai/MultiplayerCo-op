@@ -136,6 +136,38 @@ public class GameController : NetworkBehaviour
         DamageCalculate.Instance.DamageTo(target, attacker, damage);
     }
 
+    public bool? CreatureTagDetect(string ownerTag, string collisionTag)
+    {
+        if (collisionTag.Equals("Mobs")) return true; //always take damage
+        if (collisionTag.Equals(ownerTag)) return false;
+
+        switch (collisionTag)
+        {
+            case "Character":
+                {
+                    if (ownerTag.Equals("Ally")) return false;
+                    else return true;
+                }
+            case "Ally":
+                {
+                    if (ownerTag.Equals("Character")) return false;
+                    else return true;
+                }
+            case "Boss":
+                {
+                    if (ownerTag.Equals("Enemy")) return false;
+                    else return true;
+                }
+            case "Enemy":
+                {
+                    if (ownerTag.Equals("Boss")) return false;
+                    else return true;
+                }
+        }
+
+        return null;
+    }
+
     [ClientRpc]
     private void CreatureSpawnClientRpc(CreatureForm form, string cName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
     {

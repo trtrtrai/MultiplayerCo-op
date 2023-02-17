@@ -2,6 +2,7 @@ using Assets.Scripts.Both.Creature.Attackable;
 using Assets.Scripts.Both.Creature;
 using System.Collections.Generic;
 using Assets.Scripts.Both.Creature.Status;
+using Assets.Scripts.Server.Creature.Attackable;
 
 namespace Assets.Scripts.Server.Contruction.Builders
 {
@@ -24,6 +25,11 @@ namespace Assets.Scripts.Server.Contruction.Builders
         public virtual void GiveAttackable(Attackable attackable)
         {
             creature.InitAttack(attackable);
+            if (attackable.TouchDamage)
+            {
+                var detect = (creature as Both.Creature.Creature).gameObject.AddComponent<TouchDamageDetect>();
+                detect.Owner = creature as ICreature;
+            }
         }
 
         public virtual void AttachGameObject(string path, string name = "")

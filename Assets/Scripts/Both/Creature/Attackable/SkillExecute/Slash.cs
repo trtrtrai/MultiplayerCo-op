@@ -45,7 +45,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         public override void SkillTagExecuteCollider2d(GameObject obj)
         {
             if (!IsOwner) return;
-            if (obj.tag.Equals("Boss") || obj.tag.Equals("Enemy"))
+            if (obj.tag.Equals("Boss") || obj.tag.Equals("Enemy") || obj.tag.Equals("Mobs"))
             {
 
                 //send to execute skill tag place

@@ -77,17 +77,17 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Attack()
         {
-            creature.ActivateSkill(0, ResetAttack, GetComponent<Creature>());
+            creature.ActivateSkill(0, ResetAttack, transform);
         }
 
         private void SpAttack()
         {
-            creature.ActivateSkill(1, ResetSpAttack, GetComponent<Creature>());
+            creature.ActivateSkill(1, ResetSpAttack, transform);
         }
 
         private void SpAttack2()
         {
-            creature.ActivateSkill(2, ResetSpAttack2, GetComponent<Creature>());
+            creature.ActivateSkill(2, ResetSpAttack2, transform);
         }
 
         private void ResetAttack()

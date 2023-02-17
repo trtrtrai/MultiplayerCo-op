@@ -10,8 +10,11 @@ namespace Assets.Scripts.Both.DynamicObject
         [SerializeField] protected int damage;
         [SerializeField] protected Vector2 direction;
         [SerializeField] protected float speed;
+        [SerializeField] protected float timer;
+        [SerializeField] protected bool isSetup = false;
+        //float mass for knockback v.v.
 
-        protected ICreature owner; //inject
+        protected Creature.Creature owner; //inject
 
         private void Start()
         {
@@ -23,6 +26,17 @@ namespace Assets.Scripts.Both.DynamicObject
         private void FixedUpdate()
         {
             rigid.velocity = direction * speed * Time.fixedDeltaTime;
+
+            if (!isSetup) return;
+
+            if (timer > 0)
+            {
+                timer -= Time.fixedDeltaTime;
+            }
+            else
+            {
+                BulletCollisioned();
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -31,38 +45,17 @@ namespace Assets.Scripts.Both.DynamicObject
             if (collision.gameObject is null) return;
 
             var collisionTag = collision.gameObject.tag;
-
-            if (collisionTag.Equals("Mobs")) //always take damage
+            var detectRs = GameController.Instance.CreatureTagDetect(owner.tag, collisionTag);
+            if (detectRs is null) //wall,rock,...
             {
-                //Debug.Log(collision.gameObject.name + " take " + damage + " damage!");
-                GameController.Instance.Damage(collision.GetComponent<ICreature>(), NetworkObject, damage);
                 BulletCollisioned();
                 return;
             }
-            if (collisionTag.Equals(tag)) return; //same tag
-
-            if (tag.Equals("Character") || tag.Equals("Ally"))
+            else if (detectRs == true)
             {
-                if (collisionTag.Equals("Boss") || collisionTag.Equals("Enemy") || collisionTag.Equals("Mobs"))
-                {
-                    //Debug.Log(collision.gameObject.name + " take " + damage + " damage!");
-                    BulletCollisioned();
-                    return;
-                }
+                GameController.Instance.Damage(collision.gameObject.GetComponent<ICreature>(), NetworkObject, damage);
+                BulletCollisioned();
             }
-
-            if (tag.Equals("Boss") || tag.Equals("Enemy"))
-            {
-                if (collisionTag.Equals("Character") || collisionTag.Equals("Ally") || collisionTag.Equals("Mobs"))
-                {
-                    //Debug.Log(collision.gameObject.name + " take " + damage + " damage!");
-                    BulletCollisioned();
-                    return;
-                }
-            }
-
-            //Debug.Log(collision.gameObject.name + " is not creature");
-            BulletCollisioned();
         }
 
         private void BulletCollisioned()
@@ -71,16 +64,20 @@ namespace Assets.Scripts.Both.DynamicObject
             Destroy(gameObject);
         }
 
-        public void InjectBulletInfo(int damage, Vector2 direction, float speed)
+        public void InjectBulletInfo(int damage, Vector2 direction, float speed, ICreature caster, float duration)
         {
             this.damage = damage;
             this.direction = direction.normalized;
             this.speed = speed;
+            owner = caster as Creature.Creature;
+            timer = duration;
+
+            isSetup = true; // run timer duration
         }
     }
 
     public interface IBulletInitial
     {
-        void InjectBulletInfo(int damage, Vector2 direction, float speed);
+        void InjectBulletInfo(int damage, Vector2 direction, float speed, ICreature caster, float duration);
     }
 }

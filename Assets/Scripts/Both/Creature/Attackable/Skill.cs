@@ -27,9 +27,9 @@ namespace Assets.Scripts.Both.Creature.Attackable
             cooldown = model.Cooldown;
         }
 
-        public void Activate(Action callback, Creature owner, Creature target)
+        public void Activate(Action callback, Creature owner, Transform target)
         {
-            OnActivate?.Invoke(callback, new SkillPackageEventArg(owner.GetComponent<NetworkObject>(), target.GetComponent<NetworkObject>(), new Vector3(0.2f, 0.2f)));
+            OnActivate?.Invoke(callback, new SkillPackageEventArg(owner.transform, target, new Vector3(0.2f, 0.2f)));
         }
 
         public void AddListener(Action<Action, SkillPackageEventArg> subscriber)
@@ -57,16 +57,16 @@ namespace Assets.Scripts.Both.Creature.Attackable
 
     public interface ISkillActivate
     {
-        void Activate(Action callback, Creature owner, Creature target);
+        void Activate(Action callback, Creature owner, Transform target);
     }
 
     public class SkillPackageEventArg : EventArgs
     {
-        public readonly NetworkObject Caster;
-        public readonly NetworkObject Target;
+        public readonly Transform Caster;
+        public readonly Transform Target;
         public readonly Vector3 CastPlace;
 
-        public SkillPackageEventArg(NetworkObject caster, NetworkObject target, Vector3 castPlace)
+        public SkillPackageEventArg(Transform caster, Transform target, Vector3 castPlace)
         {
             Caster = caster;
             Target = target;

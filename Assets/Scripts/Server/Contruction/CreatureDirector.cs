@@ -69,10 +69,10 @@ namespace Assets.Scripts.Server.Contruction
         public void BossBuild(BossName boss)
         {
             //Game Object
-            builder.InstantiateGameObject("Treant");
+            builder.InstantiateGameObject(boss.ToString());
 
             //Load scriptable object
-            var script = Resources.Load<BossModel>(path + "Boss/Treant");
+            var script = Resources.Load<BossModel>(path + "Boss/" + boss.ToString());
 
             //Init property
             builder.GiveName(script.CreatureName);

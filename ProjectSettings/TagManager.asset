@@ -13,11 +13,12 @@ TagManager:
   - Character
   - Ally
   - Mobs
+  - SpecialPoint
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ColliderObstacles
   - Water
   - UI
   - 

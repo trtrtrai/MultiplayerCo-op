@@ -19,10 +19,10 @@ MonoBehaviour:
   - Type: 1
     Amount: 50
   - Type: 2
-    Amount: 35
+    Amount: 30
   - Type: 3
     Amount: 250
   - Type: 4
-    Amount: 15
+    Amount: 10
   SkillSlot: 4
   TouchDamage: 1

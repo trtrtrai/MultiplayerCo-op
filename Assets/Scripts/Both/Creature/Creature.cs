@@ -2,6 +2,7 @@ using Assets.Scripts.Both.Creature.Attackable;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -40,7 +41,7 @@ namespace Assets.Scripts.Both.Creature
             return attackable.Skills.Select(s => (ISkill)s).ToList();
         }
 
-        public bool ActivateSkill(int index, Action callback, Creature target)
+        public bool ActivateSkill(int index, Action callback, Transform target)
         {
             ISkillActivate skill = attackable.Skills[index];
 
@@ -60,8 +61,13 @@ namespace Assets.Scripts.Both.Creature
 
             this.status.ForEach(s =>
             {
-                s.OnStatsChange += (o, a) => { StatsChange?.Invoke(this, a); };
+                s.OnStatsChange += Status_OnStatsChange;
             });
+        }
+
+        private void Status_OnStatsChange(object sender, StatsChangeEventArgs args)
+        {
+            StatsChange?.Invoke(this, args);
         }
 
         public virtual void InitAttack(Attackable.Attackable attackable)
@@ -98,6 +104,6 @@ namespace Assets.Scripts.Both.Creature
 
         IStats GetStats(StatsType type);
         public List<ISkill> GetSkills();
-        public bool ActivateSkill(int index, Action callback, Creature target);
+        public bool ActivateSkill(int index, Action callback, Transform target);
     }
 }

@@ -1,5 +1,5 @@
 using Assets.Scripts.Both.Creature.Attackable;
-using System.Collections;
+using Pathfinding;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -47,6 +47,10 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {      
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
+            var player = GameObject.FindGameObjectWithTag("Character");
+            GetComponent<AIDestinationSetter>().target = player.transform;
+            //transform.right = (Vector2)GetComponent<AIPath>().desiredVelocity;
+
             if (timer > 0)
             {
                 timer -= Time.fixedDeltaTime;
@@ -57,7 +61,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (target) targetCreature = target.GetComponent<Creature>();
                 else targetCreature = GetComponent<Creature>();
-                creature.ActivateSkill(0, () => { }, targetCreature);
+                creature.ActivateSkill(0, () => { }, targetCreature.transform);
 
                 timer = skills[0].Cooldown;
             }

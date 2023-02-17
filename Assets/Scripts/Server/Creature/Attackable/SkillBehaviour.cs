@@ -98,13 +98,21 @@ namespace Assets.Scripts.Server.Creature.Attackable
                 case AttackTag.Bullet:
                     {
                         var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/Bullet"));
-                        bullet.tag = args.Caster.tag;
 
                         var direction = GetSkillDirection(args.Caster.GetComponent<Animator>());
                         bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
                         //Debug.Log(bullet.transform.localPosition);
                         IBulletInitial script = bullet.GetComponent<Bullet>();
-                        script.InjectBulletInfo(100, direction, 175f);
+                        var damage = creature.GetStats(Both.Scriptable.StatsType.Strength).GetValue();
+                        if (tag.AddOrMultiple) //multiple
+                        {
+                            damage = (int)(damage * tag.EffectNumber);
+                        }
+                        else
+                        {
+                            damage = damage + (int)tag.EffectNumber;
+                        }
+                        script.InjectBulletInfo(damage, direction, 200f, creature, tag.Duration);
 
                         GameController.Instance.SpawnGameObject(bullet, true);
                         break;
