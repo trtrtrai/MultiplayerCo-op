@@ -55,6 +55,7 @@ namespace Assets.Scripts.Server.Contruction
             var attackable = new Attackable();
             attackable.TouchDamage = script.TouchDamage;
             attackable.SkillSlot = script.SkillSlot;
+            attackable.AttackRange = script.AttackRange;
 
             //Instantiate skills
             var skillName = GameController.Instance.GetCreatureSkill(charClass.ToString().Replace("_model", ""));
@@ -91,6 +92,7 @@ namespace Assets.Scripts.Server.Contruction
             var attackable = new Attackable();
             attackable.TouchDamage = script.TouchDamage;
             attackable.SkillSlot = script.SkillSlot;
+            attackable.AttackRange = script.AttackRange;
 
             //Instantiate skills
             var skillName = GameController.Instance.GetCreatureSkill(boss.ToString());
@@ -126,6 +128,7 @@ namespace Assets.Scripts.Server.Contruction
             var attackable = new Attackable();
             attackable.TouchDamage = script.TouchDamage;
             attackable.SkillSlot = script.SkillSlot;
+            attackable.AttackRange = script.AttackRange;
 
             //Instantiate skills
             var skillName = GameController.Instance.GetCreatureSkill(cName);

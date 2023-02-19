@@ -196,6 +196,7 @@ public class GameController : NetworkBehaviour
         var attackable = new Attackable();
         attackable.TouchDamage = script.TouchDamage;
         attackable.SkillSlot = script.SkillSlot;
+        attackable.AttackRange = script.AttackRange;
 
         //Instantiate skills
         var skillName = GetCreatureSkill(cName.Replace(" ", ""));

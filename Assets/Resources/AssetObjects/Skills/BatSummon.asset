@@ -27,3 +27,4 @@ MonoBehaviour:
     StatsType: 0
     Place: 1
     SummonCreature: Bat
+    SummonAmount: 3

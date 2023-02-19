@@ -21,8 +21,9 @@ MonoBehaviour:
   - Type: 2
     Amount: 30
   - Type: 3
-    Amount: 250
+    Amount: 220
   - Type: 4
     Amount: 10
   SkillSlot: 4
   TouchDamage: 1
+  AttackRange: 1

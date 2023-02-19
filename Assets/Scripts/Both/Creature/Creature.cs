@@ -21,6 +21,7 @@ namespace Assets.Scripts.Both.Creature
         public string Name => creatureName;
         public int SkillSlot => attackable.SkillSlot;
         public bool TouchDamage => attackable.TouchDamage;
+        public float AttackRange => attackable.AttackRange;
         public CreatureForm Form => form;
 
         public virtual IStats GetStats(StatsType type)
@@ -100,6 +101,7 @@ namespace Assets.Scripts.Both.Creature
         public string Name { get; }
         public int SkillSlot { get; }
         public bool TouchDamage { get; }
+        public float AttackRange { get; }
         public CreatureForm Form { get; }
 
         IStats GetStats(StatsType type);

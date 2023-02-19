@@ -101,8 +101,9 @@ namespace Assets.Scripts.Server.Creature.Attackable
 
                         var direction = GetSkillDirection(args.Caster.GetComponent<Animator>());
                         bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
-                        //Debug.Log(bullet.transform.localPosition);
+
                         IBulletInitial script = bullet.GetComponent<Bullet>();
+
                         var damage = creature.GetStats(Both.Scriptable.StatsType.Strength).GetValue();
                         if (tag.AddOrMultiple) //multiple
                         {
@@ -112,7 +113,8 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         {
                             damage = damage + (int)tag.EffectNumber;
                         }
-                        script.InjectBulletInfo(damage, direction, 200f, creature, tag.Duration);
+
+                        script.InjectBulletInfo(damage, direction, 250f, creature, tag.Duration);
 
                         GameController.Instance.SpawnGameObject(bullet, true);
                         break;
@@ -138,26 +140,29 @@ namespace Assets.Scripts.Server.Creature.Attackable
             {
                 case SpecialTag.Summon:
                     {
-                        var critter = GameController.Instance.CreatureInstantiate(tag.SummonCreature);
-                        critter.tag = GetCreatureTag(args.Caster.tag);
-
-                        switch (tag.Place)
+                        var offset = Vector3.zero; //optimize: spawn with odd/even number?
+                        for (int i = 0; i < tag.SummonAmount; i++)
                         {
-                            case SummonPlace.Position:
-                                {
-                                    critter.transform.localPosition = args.Caster.transform.localPosition;
-                                    break;
-                                }
-                            case SummonPlace.Target:
-                                {
-                                    if (args.Target is null) return;
+                            switch (tag.Place)
+                            {
+                                case SummonPlace.Position:
+                                    {
+                                        Summon(tag.SummonCreature, args.Caster.transform.localPosition + offset, args);
+                                        break;
+                                    }
+                                case SummonPlace.Target:
+                                    {
+                                        if (args.Target is null) return;
 
-                                    critter.transform.localPosition = args.Target.transform.localPosition;
-                                    break;
-                                }
+                                        Summon(tag.SummonCreature, args.Target.transform.localPosition + offset, args);
+                                        break;
+                                    }
+                            }
+
+                            offset.x += 0.5f;
+                            offset.y += 0.5f;
                         }
-                        var script = critter.GetComponent<Both.Creature.Creature>();
-                        GameController.Instance.SpawnCreature(script, critter.tag, true);
+
                         break;
                     }
                 case SpecialTag.Teleport:
@@ -169,6 +174,17 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         break;
                     }
             }
+        }
+
+        private void Summon(string name, Vector3 position, SkillPackageEventArg args)
+        {
+            var critter = GameController.Instance.CreatureInstantiate(name);
+            critter.tag = GetCreatureTag(args.Caster.tag);
+
+            critter.transform.localPosition = position;
+
+            var script = critter.GetComponent<Both.Creature.Creature>();
+            GameController.Instance.SpawnCreature(script, critter.tag, true);
         }
 
         private Vector2 GetSkillDirection(Animator animator)

@@ -15,7 +15,7 @@ namespace Assets.Scripts.Both.Creature.Player
 
         private void LateUpdate()
         {
-            if (!start) return;
+            if (!start || !Target) return;
 
             //Lerp from player pos to camera pos
             var cameraPos = Target.localPosition + Offset;

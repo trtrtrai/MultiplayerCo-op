@@ -4184,6 +4184,7 @@ GameObject:
   - component: {fileID: 1239274148}
   - component: {fileID: 1239274150}
   - component: {fileID: 1239274151}
+  - component: {fileID: 1239274152}
   m_Layer: 3
   m_Name: Wall
   m_TagString: Wall
@@ -6031,7 +6032,7 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_UsedByComposite: 1
   m_Offset: {x: -13.512583, y: 0.5335922}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -6057,7 +6058,7 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_UsedByComposite: 1
   m_Offset: {x: 2.0083694, y: -10.421127}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -6083,7 +6084,7 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_UsedByComposite: 1
   m_Offset: {x: 2.008369, y: 11.053118}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -6109,7 +6110,7 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_UsedByComposite: 1
   m_Offset: {x: 17.59, y: 0.5335922}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -6144,6 +6145,92 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!66 &1239274152
+CompositeCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239274141}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_GeometryType: 0
+  m_GenerationType: 0
+  m_EdgeRadius: 0
+  m_ColliderPaths:
+  - m_Collider: {fileID: 1239274150}
+    m_ColliderPaths:
+    - - X: 181069120
+        Y: 120486984
+      - X: 170730880
+        Y: 120486984
+      - X: 170730880
+        Y: -109815136
+      - X: 181069120
+        Y: -109815136
+  - m_Collider: {fileID: 1239274148}
+    m_ColliderPaths:
+    - - X: 180633104
+        Y: -99761792
+      - X: -140465712
+        Y: -99761792
+      - X: -140465712
+        Y: -108660752
+      - X: 180633104
+        Y: -108660752
+  - m_Collider: {fileID: 1239274149}
+    m_ColliderPaths:
+    - - X: 180633104
+        Y: 120191936
+      - X: -140465712
+        Y: 120191936
+      - X: -140465712
+        Y: 100870416
+      - X: 180633104
+        Y: 100870416
+  - m_Collider: {fileID: 1239274147}
+    m_ColliderPaths:
+    - - X: -129956704
+        Y: 120486984
+      - X: -140294960
+        Y: 120486984
+      - X: -140294960
+        Y: -109815136
+      - X: -129956704
+        Y: -109815136
+  m_CompositePaths:
+    m_Paths:
+    - - {x: -12.9957, y: -10.981514}
+      - {x: -12.995641, y: -10.8660755}
+      - {x: 17.073088, y: -10.866105}
+      - {x: 17.073116, y: -10.981514}
+      - {x: 18.106913, y: -10.981484}
+      - {x: 18.106884, y: 12.048698}
+      - {x: 17.073088, y: 12.048669}
+      - {x: 17.07306, y: 12.019194}
+      - {x: -12.99567, y: 12.019223}
+      - {x: -12.9957, y: 12.048698}
+      - {x: -14.029496, y: 12.048669}
+      - {x: -14.029525, y: 12.019194}
+      - {x: -14.046572, y: 12.019164}
+      - {x: -14.046542, y: 10.087042}
+      - {x: -14.029496, y: 10.087012}
+      - {x: -14.029525, y: -9.976179}
+      - {x: -14.046572, y: -9.976209}
+      - {x: -14.046542, y: -10.8660755}
+      - {x: -14.029496, y: -10.866105}
+      - {x: -14.029468, y: -10.981514}
+    - - {x: 17.073088, y: -9.97615}
+      - {x: -12.99567, y: -9.97615}
+      - {x: -12.995641, y: 10.087042}
+      - {x: 17.073088, y: 10.087012}
+  m_VertexDistance: 0.0005
+  m_OffsetDistance: 0.00005
 --- !u!1 &1299972174
 GameObject:
   m_ObjectHideFlags: 0

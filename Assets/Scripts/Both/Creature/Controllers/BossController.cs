@@ -75,7 +75,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creature.GetSkills()[0].SkillName, null);
                 skillObj.transform.localPosition = place.localPosition;
                 GameController.Instance.SpawnGameObject(skillObj, true);
-                skillObj.GetComponent<AutoDestroy>().Setup(3.5f);
+                skillObj.AddComponent<AutoDestroy>().Setup(3.5f);
 
                 creature.ActivateSkill(0, () => { }, place);
                 timer = skills[0].Cooldown;

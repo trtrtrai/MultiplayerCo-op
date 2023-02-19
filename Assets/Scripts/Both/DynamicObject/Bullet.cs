@@ -42,6 +42,7 @@ namespace Assets.Scripts.Both.DynamicObject
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (!IsOwner) return;
+            if (!IsSpawned) return;
             if (collision.gameObject is null) return;
 
             var collisionTag = collision.gameObject.tag;

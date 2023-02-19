@@ -75,6 +75,9 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                 EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonCreature"))),
                     property.FindPropertyRelative("SummonCreature"));
                 line++;
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonAmount"))),
+                    property.FindPropertyRelative("SummonAmount"));
+                line++;
             }
 
             // Set indent back to what it was

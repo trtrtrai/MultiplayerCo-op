@@ -17,17 +17,18 @@ namespace Assets.Scripts.Both.Creature.Attackable
         public SpecialTag Special;
 
         // Always show
-        public float Duration; // time to end of skill's effect
-        public float EffectNumber; // number effect to calculation
+        public float Duration; //time to end of skill's effect
+        public float EffectNumber; //number effect to calculation
 
         // Attack tag
-        public bool AddOrMultiple; // true is multiple
+        public bool AddOrMultiple; //true is multiple
 
         // Effect tag
         public StatsType StatsType;
 
         // Special tag
-        public SummonPlace Place; // Summon
-        public string SummonCreature;
+        public SummonPlace Place; //Summon
+        public string SummonCreature; //Summon
+        public int SummonAmount; //Summon
     }
 }

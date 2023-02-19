@@ -9,5 +9,6 @@ namespace Assets.Scripts.Both.Creature.Attackable
         public int SkillSlot;
         public List<Skill> Skills;
         public bool TouchDamage;
+        public float AttackRange;
     }
 }
