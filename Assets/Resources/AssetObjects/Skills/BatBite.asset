@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillName: 5
   Description: A bite of a bat.
+  Range: 0.75
   CastDelay: 0.3
   Cooldown: 3.5
   SkillTags:
@@ -22,8 +23,11 @@ MonoBehaviour:
     Effect: 0
     Special: 0
     Duration: 0.3
-    EffectNumber: 1.25
+    EffectNumber: 0.33
     AddOrMultiple: 1
+    BulletAmount: 0
+    Direction: 0
     StatsType: 0
     Place: 0
     SummonCreature: 
+    SummonAmount: 0

@@ -14,6 +14,7 @@ TagManager:
   - Ally
   - Mobs
   - SpecialPoint
+  - Stand
   layers:
   - Default
   - TransparentFX

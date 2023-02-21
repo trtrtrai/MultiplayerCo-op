@@ -11,7 +11,6 @@ namespace Assets.Scripts.Both.Scriptable
         public List<StatsInfo> Status;
         public int SkillSlot;
         public bool TouchDamage;
-        public float AttackRange;
     }
 
     [Serializable]

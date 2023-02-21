@@ -10,24 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
-  m_Name: FireBall
+  m_Name: TriFireBall
   m_EditorClassIdentifier: 
-  SkillName: 0
-  Description: Shoot a fireball on current caster's direction with 150% caster's
-    strength.
-  Range: -1
+  SkillName: 7
+  Description: Three fire ball.
+  Range: 5
   CastDelay: 0.25
-  Cooldown: 7
+  Cooldown: 25
   SkillTags:
   - Tag: 0
     Attack: 1
     Effect: 0
-    Special: 2
+    Special: 0
     Duration: 15
-    EffectNumber: 1.5
+    EffectNumber: 2
     AddOrMultiple: 1
-    BulletAmount: 1
-    Direction: 0
+    BulletAmount: 3
+    Direction: 1
     StatsType: 0
     Place: 0
     SummonCreature: 

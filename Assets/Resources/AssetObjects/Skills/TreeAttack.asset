@@ -10,23 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
-  m_Name: FireBall
+  m_Name: TreeAttack
   m_EditorClassIdentifier: 
-  SkillName: 0
-  Description: Shoot a fireball on current caster's direction with 150% caster's
-    strength.
-  Range: -1
-  CastDelay: 0.25
-  Cooldown: 7
+  SkillName: 6
+  Description: Attack of tree.
+  Range: 0.75
+  CastDelay: 0
+  Cooldown: 2.5
   SkillTags:
   - Tag: 0
-    Attack: 1
+    Attack: 0
     Effect: 0
-    Special: 2
-    Duration: 15
-    EffectNumber: 1.5
+    Special: 0
+    Duration: 1
+    EffectNumber: 0.33
     AddOrMultiple: 1
-    BulletAmount: 1
+    BulletAmount: 0
     Direction: 0
     StatsType: 0
     Place: 0

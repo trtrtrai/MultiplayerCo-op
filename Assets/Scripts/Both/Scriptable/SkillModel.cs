@@ -10,6 +10,7 @@ namespace Assets.Scripts.Both.Scriptable
     {
         public SkillName SkillName;
         [TextArea] public string Description;
+        public float Range;
         public float CastDelay; // time delay before skill actully cast
         public float Cooldown; // time to wait for the next activate
         public List<SkillTag> SkillTags;

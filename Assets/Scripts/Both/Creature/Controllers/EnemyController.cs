@@ -82,7 +82,6 @@ namespace Assets.Scripts.Both.Creature.Controllers
             //Animation
             if (!IsUpdateAnimation) return;
 
-            //Flip sprite
             UpdateAnimation();
         }
 
@@ -129,7 +128,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
 
-            if (Vector2.Distance((Vector2)target.localPosition, rigid.position) <= creature.AttackRange)
+            if (Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[0].Range)
             {
                 Attack();
                 return;

@@ -13,10 +13,12 @@ namespace Assets.Scripts.Both.Creature.Attackable
         [SerializeField] private SkillName skillName;
         [SerializeField] private float castDelay;
         [SerializeField] private float cooldown;
+        [SerializeField] private float range;
 
         public SkillName SkillName => skillName;
         public float CastDelay => castDelay;
         public float Cooldown => cooldown;
+        public float Range => range;
         public string Description { get; set; }
 
         public Skill(SkillModel model)
@@ -25,6 +27,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
             Description = model.Description;
             castDelay = model.CastDelay;
             cooldown = model.Cooldown;
+            range = model.Range;
         }
 
         public void Activate(Action callback, Creature owner, Transform target)
@@ -50,6 +53,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         SkillName SkillName { get; }
         float CastDelay { get; }
         float Cooldown { get; }
+        float Range { get; }
         string Description { get; }
         void AddListener(Action<Action, SkillPackageEventArg> subscriber);
         void RemoveListener(Action<Action, SkillPackageEventArg> subscriber);

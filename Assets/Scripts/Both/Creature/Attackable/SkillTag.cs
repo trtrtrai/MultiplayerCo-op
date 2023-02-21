@@ -22,6 +22,8 @@ namespace Assets.Scripts.Both.Creature.Attackable
 
         // Attack tag
         public bool AddOrMultiple; //true is multiple
+        public int BulletAmount; //Bullet
+        public BulletDirection Direction; //Bullet
 
         // Effect tag
         public StatsType StatsType;

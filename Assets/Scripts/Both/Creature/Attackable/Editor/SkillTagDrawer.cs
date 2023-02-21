@@ -38,6 +38,18 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                 EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
                     property.FindPropertyRelative("AddOrMultiple"), new GUIContent("Is Strength Scale"));
                 line++;
+
+                var atkIndex = property.FindPropertyRelative("Attack").enumValueIndex;
+
+                if (atkIndex == 1)
+                {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
+                    property.FindPropertyRelative("BulletAmount"), new GUIContent("BulletAmount"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
+                    property.FindPropertyRelative("Direction"), new GUIContent("Direction"));
+                    line++;
+                }
             }
             else if (index == 1)
             {

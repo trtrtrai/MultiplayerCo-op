@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillName: 2
   Description: Summon a lot of many bats into the field.
+  Range: -1
   CastDelay: 3
   Cooldown: 20
   SkillTags:
@@ -24,7 +25,9 @@ MonoBehaviour:
     Duration: 0
     EffectNumber: 0
     AddOrMultiple: 0
+    BulletAmount: 0
+    Direction: 0
     StatsType: 0
-    Place: 1
+    Place: 0
     SummonCreature: Bat
     SummonAmount: 3

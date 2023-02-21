@@ -77,16 +77,19 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Attack()
         {
+            if (this is null) return;
             creature.ActivateSkill(0, ResetAttack, transform);
         }
 
         private void SpAttack()
         {
+            if (this is null) return;
             creature.ActivateSkill(1, ResetSpAttack, transform);
         }
 
         private void SpAttack2()
         {
+            if (this is null) return;
             creature.ActivateSkill(2, ResetSpAttack2, transform);
         }
 

@@ -97,26 +97,18 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     }
                 case AttackTag.Bullet:
                     {
-                        var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/Bullet"));
-
-                        var direction = GetSkillDirection(args.Caster.GetComponent<Animator>());
-                        bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
-
-                        IBulletInitial script = bullet.GetComponent<Bullet>();
-
-                        var damage = creature.GetStats(Both.Scriptable.StatsType.Strength).GetValue();
-                        if (tag.AddOrMultiple) //multiple
+                        var direction = tag.Direction == BulletDirection.Orientation ? GetSkillDirection(args.Caster.GetComponent<Animator>()) : (Vector2)(args.Target.localPosition - args.Caster.localPosition);
+                        var rad = 0.083f; //15 degrees
+                        for (int i = 0; i < tag.BulletAmount; i++)
                         {
-                            damage = (int)(damage * tag.EffectNumber);
-                        }
-                        else
-                        {
-                            damage = damage + (int)tag.EffectNumber;
-                        }
+                            FireBullet(creature, tag, direction, args);
 
-                        script.InjectBulletInfo(damage, direction, 250f, creature, tag.Duration);
+                            var x = Mathf.Cos(rad * (float)Math.PI) * direction.x - Mathf.Sin(rad * (float)Math.PI) * direction.y;
+                            var y = Mathf.Sin(rad * (float)Math.PI) * direction.x + Mathf.Cos(rad * (float)Math.PI) * direction.y;
 
-                        GameController.Instance.SpawnGameObject(bullet, true);
+                            direction.x = x;
+                            direction.y = y;
+                        }
                         break;
                     }
                 case AttackTag.SelfArea:
@@ -147,7 +139,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                             {
                                 case SummonPlace.Position:
                                     {
-                                        Summon(tag.SummonCreature, args.Caster.transform.localPosition + offset, args);
+                                        Summon(tag.SummonCreature, args.CastPlace + offset, args);
                                         break;
                                     }
                                 case SummonPlace.Target:
@@ -174,6 +166,36 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         break;
                     }
             }
+        }
+
+        private void FireBullet(ICreature creature, SkillTag tag, Vector2 direction, SkillPackageEventArg args)
+        {
+            var bullet = CreateBullet(direction, args);
+
+            IBulletInitial script = bullet.GetComponent<Bullet>();
+
+            var damage = creature.GetStats(Both.Scriptable.StatsType.Strength).GetValue();
+            if (tag.AddOrMultiple) //multiple
+            {
+                damage = (int)(damage * tag.EffectNumber);
+            }
+            else
+            {
+                damage = damage + (int)tag.EffectNumber;
+            }
+
+            script.InjectBulletInfo(damage, direction, 250f, creature, tag.Duration);
+
+            GameController.Instance.SpawnGameObject(bullet, true);
+        }
+
+        private GameObject CreateBullet(Vector2 direction, SkillPackageEventArg args)
+        {
+            var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/Bullet"));
+
+            bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
+
+            return bullet;
         }
 
         private void Summon(string name, Vector3 position, SkillPackageEventArg args)

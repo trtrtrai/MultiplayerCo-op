@@ -1,11 +1,9 @@
 using Assets.Scripts.Both.Creature.Attackable;
-using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
-using Assets.Scripts.Both.DynamicObject;
+using Assets.Scripts.Both.Scriptable;
+using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Both.Creature.Controllers
@@ -13,11 +11,24 @@ namespace Assets.Scripts.Both.Creature.Controllers
     public class BossController : NetworkBehaviour, ICreatureController
     {
         private ICreature creature;
+        private int lookAtRad;
         [SerializeField] private Animator animator;
-        [SerializeField] private Rigidbody2D player;
+        [SerializeField] private Rigidbody2D rigid;
         [SerializeField] private Transform target;
+        [SerializeField] private int speed;
+        [SerializeField] private float nextWayPointDistance = .5f;
+        Path path;
+        [SerializeField] int currentWayPoint;
+        [SerializeField] bool reachedEndOfPath; // is in range of target
+        Seeker seeker;
         [SerializeField] private List<ISkill> skills;
         [SerializeField] private float timer;
+
+        private Queue<int> skillQueue;
+        private List<bool> skillActivable;
+
+        private int currentHealth;
+        private int limitChange; // list???
 
         public bool IsUpdateAnimation { get; set; }
         public Animator Animator => animator;
@@ -25,8 +36,10 @@ namespace Assets.Scripts.Both.Creature.Controllers
         private void Awake()
         {
             animator = GetComponent<Animator>();
-            player = GetComponent<Rigidbody2D>();
             creature = GetComponent<Creature>();
+
+            rigid = GetComponent<Rigidbody2D>();
+            seeker = GetComponent<Seeker>();
         }
 
         public void MoveNonAffect()
@@ -42,11 +55,52 @@ namespace Assets.Scripts.Both.Creature.Controllers
         // Start is called before the first frame update
         void Start()
         {
+            target = FindCharacter();
+
+            // get and listen speed
+            speed = creature.GetStats(StatsType.Speed).GetValue();
+            (creature as Creature).StatsChange += (o, a) => { if (a.Type.Name.Equals(StatsType.Speed.ToString())) speed = a.NewValue; };
+
+            //listen health to find other target (30-45%)
+            limitChange = (int)((creature as Boss.Boss).GetLimitChange()[0] * creature.GetStats(StatsType.Health).GetValue(false));
+            currentHealth = creature.GetStats(StatsType.Health).GetValue();
+            (creature as Creature).StatsChange += (o, a) => { 
+                if (a.Type.Name.Equals(StatsType.Health.ToString())) currentHealth = a.NewValue; 
+
+                if (a.OldValue > a.NewValue)
+                {
+                    var rand = Random.Range(0f, 1f);
+                    if (rand <= 0.3f)
+                    {
+                        Debug.Log("Follow other target");
+                        target = FindCharacter();
+                    }
+                }
+
+                if (a.NewValue < limitChange)
+                {
+                    Transformer();
+                }
+            };
+
+            //Setup skill choice
             skills = creature.GetSkills();
-            timer = 0;
+
+            skillActivable = new List<bool>();
+            for (int i = 0; i < skills.Count; i++)
+            {
+                skillActivable.Add(true);
+            }
+
+            skillQueue = new Queue<int>();
+            FillSkillQueue();
+            timer = 0f;
+
             //init animation
             IsUpdateAnimation = true;
-            //animator.SetInteger("orientation", 2);
+
+            //Pathfinding
+            InvokeRepeating("UpdatePath", 0f, 0.5f);
         }
 
         // Update is called once per frame
@@ -54,49 +108,271 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
 
-            if (target is null)
+            if (!target)
             {
-                var p = GameObject.FindGameObjectWithTag("Character");
-                target = p is null? null : p.transform;
+                target = FindCharacter();
+                if (!target) return;
             }
 
+            //Move
+            MoveTarget();
+
+            //Skill active timer
             if (timer > 0)
             {
                 timer -= Time.fixedDeltaTime;
             }
+
+            //Animation
+            if (!IsUpdateAnimation) return;
+
+            UpdateAnimation();
+        }
+
+        private Transform FindCharacter()
+        {
+            var objs = GameObject.FindGameObjectsWithTag("Character");
+
+            if (objs.Length == 0) return null;
+            if (objs.Length == 1) return objs[0].transform;
+
+            var rand = Random.Range(0, objs.Length);
+
+            return objs[rand].transform;
+        }
+
+        #region Skill choice
+        private void FillSkillQueue()
+        {
+            if (skillQueue.Count <= 5)
+            {
+                var addAmount = Random.Range(15, 21);
+
+                for (int i = 0; i < addAmount; i++)
+                {
+                    var skillNum = Random.Range(0, 1000);
+
+                    skillQueue.Enqueue(skillNum % (skills.Count - 1)); // last skill is after transformer
+                }
+            }
+        }
+
+        private void NextSkill()
+        {
+            skillQueue.TryDequeue(out int t); //if Peek() activable is false -> turn it to last queue
+            FillSkillQueue(); // <=5 count --> fill
+
+            timer = Random.Range(1.5f, 3f); //new timer
+        }
+
+        private void ActiveSkillQueue()
+        {
+            switch (skillQueue.Peek())
+            {
+                case 0:
+                    {
+                        Attack();
+                        break;
+                    }
+                case 1:
+                    {
+                        Summon();
+                        break;
+                    }
+                case 2:
+                    {
+                        CastSpell();
+                        break;
+                    }
+                case 3:
+                    {
+                        SpecialAttack();
+                        break;
+                    }
+            }
+        }
+
+        void Attack() ////Treant: TreeAttack
+        {
+            skillActivable[0] = false;
+            creature.ActivateSkill(0, () => { skillActivable[0] = true; }, target);
+
+            NextSkill();
+        }
+
+        void Summon() //Treant: BatSummon
+        {
+            skillActivable[1] = false;
+            creature.ActivateSkill(1, () => { skillActivable[1] = true; }, target);
+
+            NextSkill();
+        }
+
+        void CastSpell() //Treant: TriFireBall
+        {
+            skillActivable[2] = false;
+            creature.ActivateSkill(2, () => { skillActivable[2] = true; }, target);
+
+            NextSkill();
+        }
+
+        void Transformer() //Treant: Transformerrrrrrrr
+        {
+            //animation parameter "isTransformer"
+            animator.SetBool("isTransformer", true);
+            StartCoroutine(W());
+        }
+
+        IEnumerator W()
+        {
+            yield return new WaitForSeconds(0.25f);
+
+            animator.SetBool("isTransformer", false);
+        }
+
+        void SpecialAttack() //Treant: SunBoost
+        {
+            skillActivable[3] = false;
+            creature.ActivateSkill(3, () => { skillActivable[3] = true; }, transform);
+
+            NextSkill();
+        }
+        #endregion
+
+        #region Animation
+        private void UpdateAnimation()
+        {
+            LookAtTarget();
+        }
+
+        //Flipped and rotate boss follow target distance
+        private void LookAtTarget()
+        {
+            Vector3 flipped = transform.localScale;
+            var distanceVector = target.localPosition - (transform.localPosition + new Vector3(0, 2.5f));
+            var distance = distanceVector.normalized;
+
+            if (distance.x > 0 && distance.y > 0) //top-right = boss's face is back-right (zFlipped = -1 and yRotate = 0)
+            {
+                if (lookAtRad == 1) return;
+
+                if (lookAtRad != 4)
+                {
+                    flipped.z *= -1f;
+                    transform.localScale = flipped;
+                }
+
+                if (lookAtRad != 2)
+                {
+                    transform.Rotate(0f, 180f, 0f);
+                }
+                //Debug.Log(distance);
+                lookAtRad = 1;
+            }
+            else if (distance.x > 0 && distance.y <= 0) //bottom-right = boss's face is front-right (zFlipped = 1 and yRotate = 0)
+            {
+                if (lookAtRad == 2) return;
+
+                if (lookAtRad != 3)
+                {
+                    flipped.z *= -1f;
+                    transform.localScale = flipped;
+                }
+
+                if (lookAtRad != 1)
+                {
+                    transform.Rotate(0f, 180f, 0f);
+                }
+                //Debug.Log(distance);
+                lookAtRad = 2;
+            }
+            else if (distance.x <= 0 && distance.y > 0) //top-left = boss's face is back-left (zFlipped = 1 and yRotate = 180)
+            {
+                if (lookAtRad == 3) return;
+
+                if (lookAtRad != 2)
+                {
+                    flipped.z *= -1f;
+                    transform.localScale = flipped;
+                }
+
+                if (lookAtRad != 4)
+                {
+                    transform.Rotate(0f, 180f, 0f);
+                }
+                //Debug.Log(distance);
+                lookAtRad = 3;
+            }
+            else if (distance.x <= 0 && distance.y <= 0) //bottom-left = boss's face is back-left (zFlipped = -1 and yRotate = 180)
+            {
+                if (lookAtRad == 4) return;
+
+                if (lookAtRad != 1)
+                {
+                    flipped.z *= -1f;
+                    transform.localScale = flipped;
+                }
+
+                if (lookAtRad != 3)
+                {
+                    transform.Rotate(0f, 180f, 0f);
+                }
+                //Debug.Log(distance);
+                lookAtRad = 4;
+            }
+        }
+        #endregion
+
+        #region Pathfinding
+        private void MoveTarget()
+        {
+            if (path is null) return;
+
+            if (currentWayPoint >= path.vectorPath.Count)
+            {
+                reachedEndOfPath = true;
+                return;
+            }
             else
             {
-                Creature targetCreature;
-
-                if (target) targetCreature = target.GetComponent<Creature>();
-                else targetCreature = GetComponent<Creature>();
-                
-                var place = FindSpawningPlace(targetCreature.transform);
-                var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creature.GetSkills()[0].SkillName, null);
-                skillObj.transform.localPosition = place.localPosition;
-                GameController.Instance.SpawnGameObject(skillObj, true);
-                skillObj.AddComponent<AutoDestroy>().Setup(3.5f);
-
-                creature.ActivateSkill(0, () => { }, place);
-                timer = skills[0].Cooldown;
+                reachedEndOfPath = false;
             }
-        }
 
-        private Transform FindSpawningPlace(Transform targetCreature)
-        {
-            var objs = GameObject.FindGameObjectsWithTag("SpecialPoint").Select(o => o.transform);
+            var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
 
-            List<float> distance = new List<float>();
-
-
-            for (int i = 0; i < objs.Count(); i++)
+            if (skills[skillQueue.Peek()].Range == -1f || Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[skillQueue.Peek()].Range)
             {
-                distance.Add((objs.ElementAt(i).localPosition - targetCreature.localPosition).magnitude);
+                if (timer <= 0 && skillActivable[skillQueue.Peek()]) ActiveSkillQueue();
+                return;
             }
 
-            if (distance.Count == 0) return objs.ElementAt(0);
+            var vectorSpeed = direction * speed * Time.fixedDeltaTime;
+            rigid.velocity = new Vector2(vectorSpeed.x, vectorSpeed.y);
+            animator.SetFloat("speed", Mathf.Abs(vectorSpeed.x) + Mathf.Abs(vectorSpeed.y));
 
-            return objs.ElementAt(distance.IndexOf(distance.Min()));
+            float distance = Vector2.Distance(rigid.position, path.vectorPath[currentWayPoint]);
+
+            if (distance < nextWayPointDistance)
+            {
+                currentWayPoint++;
+            }
         }
+
+        private void UpdatePath()
+        {
+            if (target && seeker.IsDone())
+            {
+                seeker.StartPath(rigid.position, target.localPosition, OnPathComplete);
+            }
+        }
+
+        private void OnPathComplete(Path p)
+        {
+            if (p.error) return;
+
+            path = p;
+            currentWayPoint = 0;
+        }
+        #endregion
     }
 }

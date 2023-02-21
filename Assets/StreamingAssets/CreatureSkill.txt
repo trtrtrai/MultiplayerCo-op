@@ -1,6 +1,6 @@
 {
 "TankerSlash":["Slash","Shield","FireBall"],
-"Treant":["BatSummon"],
+"Treant":["TreeAttack","BatSummon","TriFireBall","SunBoost"],
 "Bat":["BatBite"],
 
 }

@@ -10,21 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
-  m_Name: Ragnarok
+  m_Name: SunBoost
   m_EditorClassIdentifier: 
-  SkillName: 1
-  Description: Apocalypse!!! Get 25pts Strength, 15pts Defense in 5 seconds and 35pts
-    Speed in 3 seconds.
+  SkillName: 8
+  Description: Sunlight boost status for tree (maybe).
   Range: -1
-  CastDelay: 0
-  Cooldown: 17.5
+  CastDelay: 0.5
+  Cooldown: 22
   SkillTags:
   - Tag: 1
     Attack: 0
-    Effect: 0
+    Effect: 1
     Special: 0
-    Duration: 5
-    EffectNumber: 25
+    Duration: 15
+    EffectNumber: 1.75
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
@@ -34,27 +33,27 @@ MonoBehaviour:
     SummonAmount: 0
   - Tag: 1
     Attack: 0
-    Effect: 0
+    Effect: 1
     Special: 0
-    Duration: 5
-    EffectNumber: 15
+    Duration: 15
+    EffectNumber: 1.5
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
-    StatsType: 2
+    StatsType: 3
     Place: 0
     SummonCreature: 
     SummonAmount: 0
   - Tag: 1
     Attack: 0
-    Effect: 0
+    Effect: 1
     Special: 0
-    Duration: 3.5
-    EffectNumber: 150
+    Duration: 15
+    EffectNumber: 2
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
-    StatsType: 3
+    StatsType: 4
     Place: 0
     SummonCreature: 
     SummonAmount: 0

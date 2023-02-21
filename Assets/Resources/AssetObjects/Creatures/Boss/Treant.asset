@@ -15,7 +15,7 @@ MonoBehaviour:
   CreatureName: Treant Boss
   Status:
   - Type: 0
-    Amount: 2000
+    Amount: 1000
   - Type: 1
     Amount: 50
   - Type: 2
@@ -26,4 +26,5 @@ MonoBehaviour:
     Amount: 10
   SkillSlot: 4
   TouchDamage: 1
-  AttackRange: 1
+  changeLimit:
+  - 0.97

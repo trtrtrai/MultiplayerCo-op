@@ -46,6 +46,7 @@ namespace Assets.Scripts.Both.DynamicObject
             if (collision.gameObject is null) return;
 
             var collisionTag = collision.gameObject.tag;
+            if (collisionTag.Equals("Bullet")) return;
             var detectRs = GameController.Instance.CreatureTagDetect(owner.tag, collisionTag);
             if (detectRs is null) //wall,rock,...
             {

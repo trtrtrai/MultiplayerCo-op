@@ -7,7 +7,10 @@ namespace Assets.Scripts.Both.Creature.Attackable
         BatSummon,
         Slash,
         Shield,
-        BatBite
+        BatBite,
+        TreeAttack,
+        TriFireBall,
+        SunBoost
     }
 
     public enum TagType
@@ -44,5 +47,11 @@ namespace Assets.Scripts.Both.Creature.Attackable
     {
         Position,
         Target,
+    }
+
+    public enum BulletDirection
+    {
+        Orientation,
+        Direction,
     }
 }

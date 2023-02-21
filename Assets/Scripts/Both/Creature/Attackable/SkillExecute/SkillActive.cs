@@ -1,6 +1,6 @@
 using Assets.Scripts.Both.Creature.Controllers;
+using Assets.Scripts.Both.DynamicObject;
 using Assets.Scripts.Both.Scriptable;
-using Assets.Scripts.Server.Creature.Attackable;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,6 +50,19 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         private IEnumerator DelayActive(Action callback)
         {
+            if (skillTags[0].Tag == TagType.Special && skillTags[0].Special == SpecialTag.Summon)
+            {
+                var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creatureSkill.SkillName.ToString(), null);
+                if (skillObj != null)
+                {
+                    var position = FindSpawningPlace(current.Target.transform).localPosition;
+                    skillObj.transform.localPosition = position;
+                    current = new SkillPackageEventArg(current.Caster, current.Target, position);
+                    GameController.Instance.SpawnGameObject(skillObj, true);
+                    skillObj.AddComponent<AutoDestroy>().Setup(creatureSkill.CastDelay + .5f);
+                }      
+            }
+
             yield return new WaitForSeconds(creatureSkill.CastDelay);
 
             //Debug.Log("Activated " + creatureSkill.SkillName);
@@ -88,6 +101,23 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         protected virtual void SpecializedBehaviour()
         {
             SkillTagExecute();
+        }
+
+        private Transform FindSpawningPlace(Transform targetCreature)
+        {
+            var objs = GameObject.FindGameObjectsWithTag("SpecialPoint").Select(o => o.transform);
+
+            List<float> distance = new List<float>();
+
+
+            for (int i = 0; i < objs.Count(); i++)
+            {
+                distance.Add((objs.ElementAt(i).localPosition - targetCreature.localPosition).magnitude);
+            }
+
+            if (distance.Count == 0) return objs.ElementAt(0);
+
+            return objs.ElementAt(distance.IndexOf(distance.Min()));
         }
 
         public virtual void SkillTagExecuteCollider2d(GameObject obj)
