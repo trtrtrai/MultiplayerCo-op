@@ -74,12 +74,15 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         private IEnumerator CDSkill(Action callback)
         {
-            while (timer > 0f)
+            // It wrong time, 17.5s --> 6.72s????
+            /*while (timer > 0f)
             {
                 timer -= Time.fixedDeltaTime; // - something...
 
                 yield return null;
-            }
+            }*/
+
+            yield return new WaitForSeconds(timer);
 
             ResetSkill();
             callback();

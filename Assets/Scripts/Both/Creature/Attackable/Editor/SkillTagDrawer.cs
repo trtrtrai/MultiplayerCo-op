@@ -62,12 +62,47 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                     new GUIContent("Stats type"));
                 line++;
             }
-            else
+            else if (index == 2)
             {
                 EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Special"))),
                     property.FindPropertyRelative("Special"),
                     new GUIContent("Special type"));
                 line++;
+
+                var speIndex = property.FindPropertyRelative("Special").enumValueIndex;
+
+                if (speIndex == 0) //Summon
+                {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SPlace"))),
+                        property.FindPropertyRelative("SPlace"),
+                        new GUIContent("Place"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonCreature"))),
+                        property.FindPropertyRelative("SummonCreature"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonAmount"))),
+                        property.FindPropertyRelative("SummonAmount"));
+                    line++;
+                }
+                else if (speIndex == 1) //Teleport
+                {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("TPlace"))),
+                        property.FindPropertyRelative("TPlace"),
+                        new GUIContent("Place"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
+                        property.FindPropertyRelative("Direction"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Distance"))),
+                        property.FindPropertyRelative("Distance"));
+                    line++;
+                }
+                else if (speIndex == 2) //Immortal
+                {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Duration"))),
+                        property.FindPropertyRelative("Duration"));
+                    line++;
+                }
             }
 
             if (index == 0 || index == 1)
@@ -77,18 +112,6 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                 line++;
                 EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("EffectNumber"))),
                     property.FindPropertyRelative("EffectNumber"));
-                line++;
-            }
-            else
-            {
-                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Place"))),
-                property.FindPropertyRelative("Place"));
-                line++;
-                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonCreature"))),
-                    property.FindPropertyRelative("SummonCreature"));
-                line++;
-                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("SummonAmount"))),
-                    property.FindPropertyRelative("SummonAmount"));
                 line++;
             }
 

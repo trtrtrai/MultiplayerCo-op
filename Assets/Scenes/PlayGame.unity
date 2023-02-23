@@ -441,6 +441,7 @@ GameObject:
   - component: {fileID: 348277118}
   - component: {fileID: 348277117}
   - component: {fileID: 348277116}
+  - component: {fileID: 348277119}
   m_Layer: 3
   m_Name: WalDecorate
   m_TagString: Untagged
@@ -714,6 +715,27 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!50 &348277119
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348277114}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &359867434
 GameObject:
   m_ObjectHideFlags: 0
@@ -1716,6 +1738,7 @@ GameObject:
   - component: {fileID: 630157749}
   - component: {fileID: 630157748}
   - component: {fileID: 630157747}
+  - component: {fileID: 630157750}
   m_Layer: 3
   m_Name: Default
   m_TagString: Untagged
@@ -2035,6 +2058,27 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!50 &630157750
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630157745}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &659383242
 GameObject:
   m_ObjectHideFlags: 0
@@ -2505,6 +2549,7 @@ GameObject:
   - component: {fileID: 928471417}
   - component: {fileID: 928471416}
   - component: {fileID: 928471418}
+  - component: {fileID: 928471419}
   m_Layer: 3
   m_Name: Collider
   m_TagString: Untagged
@@ -4210,6 +4255,27 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0.00001
+--- !u!50 &928471419
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928471414}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &930567568
 GameObject:
   m_ObjectHideFlags: 0

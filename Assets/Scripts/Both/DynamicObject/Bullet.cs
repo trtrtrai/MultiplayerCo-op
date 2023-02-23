@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Creature;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace Assets.Scripts.Both.DynamicObject
         [SerializeField] protected int damage;
         [SerializeField] protected Vector2 direction;
         [SerializeField] protected float speed;
-        [SerializeField] protected float timer;
+        [SerializeField] protected float time;
         [SerializeField] protected bool isSetup = false;
         //float mass for knockback v.v.
 
@@ -26,17 +27,6 @@ namespace Assets.Scripts.Both.DynamicObject
         private void FixedUpdate()
         {
             rigid.velocity = direction * speed * Time.fixedDeltaTime;
-
-            if (!isSetup) return;
-
-            if (timer > 0)
-            {
-                timer -= Time.fixedDeltaTime;
-            }
-            else
-            {
-                BulletCollisioned();
-            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -72,9 +62,24 @@ namespace Assets.Scripts.Both.DynamicObject
             this.direction = direction.normalized;
             this.speed = speed;
             owner = caster as Creature.Creature;
-            timer = duration;
+            time = duration;
 
             isSetup = true; // run timer duration
+
+            StartCoroutine(Wait());
+        }
+
+        IEnumerator Wait()
+        {
+            yield return new WaitForSeconds(time);
+
+            BulletCollisioned();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            StopAllCoroutines();
         }
     }
 

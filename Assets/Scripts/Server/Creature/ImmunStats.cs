@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Scriptable;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Creature
@@ -9,31 +10,31 @@ namespace Assets.Scripts.Server.Creature
     public class ImmunStats : MonoBehaviour
     {
         [SerializeField] private StatsType type; //future is List???
-        [SerializeField] private float timer;
-        [SerializeField] private bool isSetup = false;
+        [SerializeField] private float time;
+        //[SerializeField] private bool isSetup = false;
 
         public StatsType Type => type;
 
         public void Setup(StatsType type, float time)
         {
             this.type = type;
-            timer = time;
+            this.time = time;
 
-            isSetup = true;
+            //isSetup = true;
+
+            StartCoroutine(Wait());
         }
 
-        private void FixedUpdate()
+        IEnumerator Wait()
         {
-            if (!isSetup) return;
+            yield return new WaitForSeconds(time);
 
-            if (timer > 0)
-            {
-                timer -= Time.fixedDeltaTime;
-            }
-            else
-            {
-                Destroy(this);
-            }
+            Destroy(this);
+        }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
         }
     }
 }

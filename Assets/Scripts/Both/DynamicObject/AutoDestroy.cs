@@ -7,33 +7,32 @@ namespace Assets.Scripts.Both.DynamicObject
 {
     public class AutoDestroy : MonoBehaviour
     {
-        [SerializeField] private float timer;
-        [SerializeField] private bool isSetup = false;
+        [SerializeField] private float time;
+        //[SerializeField] private bool isSetup = false;
         [SerializeField] private NetworkObject owner;
 
         public void Setup(float time)
         {
-            timer = time;
+            this.time = time;
             owner = GetComponent<NetworkObject>();
 
-            isSetup = true;
+            //isSetup = true;
+
+            if (!owner.IsOwner) return; // it's owner by server
+            StartCoroutine(Wait());
         }
 
-        private void FixedUpdate()
+        IEnumerator Wait()
         {
-            if (!owner.IsOwner) return; // it's owner by server
+            yield return new WaitForSeconds(time);
 
-            if (!isSetup) return;
+            owner.Despawn();
+            Destroy(gameObject);
+        }
 
-            if (timer > 0)
-            {
-                timer -= Time.fixedDeltaTime;
-            }
-            else
-            {
-                owner.Despawn();
-                Destroy(gameObject);
-            }
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
         }
     }
 }

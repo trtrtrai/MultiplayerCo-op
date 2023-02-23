@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
-  m_Name: Slash
+  m_Name: TeleDash
   m_EditorClassIdentifier: 
-  SkillName: 3
-  Description: Normal attack of Slash Tanker.
+  SkillName: 10
+  Description: Fast move forward, can be touch obstacles. For magician.
   Range: -1
   CastDelay: 0
-  Cooldown: 0.77
+  Cooldown: 2.5
   SkillTags:
-  - Tag: 0
+  - Tag: 2
     Attack: 0
     Effect: 0
-    Special: 0
-    Duration: 0.5
+    Special: 1
+    Duration: 0
     EffectNumber: 0
     AddOrMultiple: 0
     BulletAmount: 0
@@ -31,5 +31,5 @@ MonoBehaviour:
     SPlace: 0
     SummonCreature: 
     SummonAmount: 0
-    TPlace: 0
-    Distance: 0
+    TPlace: 1
+    Distance: 3

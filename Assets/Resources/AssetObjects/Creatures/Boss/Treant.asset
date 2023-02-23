@@ -27,4 +27,4 @@ MonoBehaviour:
   SkillSlot: 4
   TouchDamage: 1
   changeLimit:
-  - 0.97
+  - 0.3

@@ -10,7 +10,9 @@ namespace Assets.Scripts.Both.Creature.Attackable
         BatBite,
         TreeAttack,
         TriFireBall,
-        SunBoost
+        SunBoost,
+        Dash,
+        TeleDash,
     }
 
     public enum TagType
@@ -49,7 +51,14 @@ namespace Assets.Scripts.Both.Creature.Attackable
         Target,
     }
 
-    public enum BulletDirection
+    public enum TeleportPlace
+    {
+        ObstaclesStop,
+        ThroughAll,
+        Point,// Choice in Range?
+    }
+
+    public enum CastDirection
     {
         Orientation,
         Direction,

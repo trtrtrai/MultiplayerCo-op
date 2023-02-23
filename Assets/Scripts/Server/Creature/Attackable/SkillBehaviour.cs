@@ -60,16 +60,37 @@ namespace Assets.Scripts.Server.Creature.Attackable
             ICreature creature = args.Caster.GetComponent<ICreature>();
             if (creature is null) return;
             var cont = (creature as NetworkBehaviour).GetComponentsInChildren<Transform>().ToListPooled().FirstOrDefault(o => o.name.Equals("TempContainer"));
+            var effNum = 0;
             switch (tag.Effect)
             {
                 case EffectTag.Add:
                     {
-                        var obj = Instantiate(Resources.Load<GameObject>("DynamicObject/StatsTemp"), cont);
-                        obj.AddComponent<TemporaryStats>().Setup(creature, tag.StatsType, (int)tag.EffectNumber, tag.Duration);
+                        effNum = (int)tag.EffectNumber;
+
+                        break;
+                    }
+                case EffectTag.Multiple:
+                    {
+                        effNum = (int)(creature.GetStats(tag.StatsType).GetValue() * tag.EffectNumber);
+
+                        break;
+                    }
+                case EffectTag.Substract:
+                    {
+                        effNum = -(int)tag.EffectNumber;
+
+                        break;
+                    }
+                case EffectTag.Divide:
+                    {
+                        effNum = (int)(creature.GetStats(tag.StatsType).GetValue() / tag.EffectNumber);
 
                         break;
                     }
             }
+
+            var obj = Instantiate(Resources.Load<GameObject>("DynamicObject/StatsTemp"), cont);
+            obj.AddComponent<TemporaryStats>().Setup(creature, tag.StatsType, effNum, tag.Duration);
         }
 
         private void AttackTypeBehaviour(SkillTag tag, SkillPackageEventArg args)
@@ -97,7 +118,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     }
                 case AttackTag.Bullet:
                     {
-                        var direction = tag.Direction == BulletDirection.Orientation ? GetSkillDirection(args.Caster.GetComponent<Animator>()) : (Vector2)(args.Target.localPosition - args.Caster.localPosition);
+                        var direction = tag.Direction == CastDirection.Orientation ? GetSkillDirection(args.Caster.GetComponent<Animator>()) : (Vector2)(args.Target.localPosition - args.Caster.localPosition);
                         var rad = 0.083f; //15 degrees
                         for (int i = 0; i < tag.BulletAmount; i++)
                         {
@@ -135,7 +156,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         var offset = Vector3.zero; //optimize: spawn with odd/even number?
                         for (int i = 0; i < tag.SummonAmount; i++)
                         {
-                            switch (tag.Place)
+                            switch (tag.SPlace)
                             {
                                 case SummonPlace.Position:
                                     {
@@ -159,6 +180,34 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     }
                 case SpecialTag.Teleport:
                     {
+                        switch (tag.TPlace)
+                        {
+                            case TeleportPlace.ObstaclesStop: //optimize after
+                                {
+                                    var direction = GetSkillDirection(args.Caster.GetComponent<Animator>()) * tag.Distance;
+                                    var position = args.Caster.localPosition + (Vector3)direction;
+                                    args.Caster.GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                                    args.Caster.GetComponent<Rigidbody2D>().MovePosition(position);
+                                    StartCoroutine(Wait(0.25f, () => { args.Caster.GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Discrete; }));
+
+                                    break;
+                                }
+                            case TeleportPlace.ThroughAll: //optimize after
+                                {
+                                    var direction = GetSkillDirection(args.Caster.GetComponent<Animator>()) * tag.Distance;
+                                    var position = args.Caster.localPosition + (Vector3)direction;
+                                    args.Caster.GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Discrete;
+                                    args.Caster.GetComponent<Rigidbody2D>().MovePosition(position);
+                                    StartCoroutine(Wait(0.25f, () => { args.Caster.GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous; }));
+
+                                    break;
+                                }
+                            case TeleportPlace.Point:
+                                {
+                                    break;
+                                }
+                        }
+
                         break;
                     }
                 case SpecialTag.Immortal:

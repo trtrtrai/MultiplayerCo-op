@@ -23,37 +23,43 @@ MonoBehaviour:
     Effect: 1
     Special: 0
     Duration: 15
-    EffectNumber: 1.75
+    EffectNumber: 0.75
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
     StatsType: 1
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0
   - Tag: 1
     Attack: 0
     Effect: 1
     Special: 0
     Duration: 15
-    EffectNumber: 1.5
+    EffectNumber: 0.5
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
     StatsType: 3
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0
   - Tag: 1
     Attack: 0
     Effect: 1
     Special: 0
     Duration: 15
-    EffectNumber: 2
+    EffectNumber: 1
     AddOrMultiple: 0
     BulletAmount: 0
     Direction: 0
     StatsType: 4
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0

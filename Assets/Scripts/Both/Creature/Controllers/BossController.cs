@@ -152,15 +152,25 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 {
                     var skillNum = Random.Range(0, 1000);
 
-                    skillQueue.Enqueue(skillNum % (skills.Count - 1)); // last skill is after transformer
+                    if (currentHealth <= limitChange) skillQueue.Enqueue(skills.Count - 1);
+                    else skillQueue.Enqueue(skillNum % (skills.Count - 1)); // last skill is after transformer
                 }
             }
         }
 
         private void NextSkill()
         {
-            skillQueue.TryDequeue(out int t); //if Peek() activable is false -> turn it to last queue
+            skillQueue.TryDequeue(out int t);
+
             FillSkillQueue(); // <=5 count --> fill
+
+            int limit = 5;
+            while (limit != 0 && !skillActivable[skillQueue.Peek()])  //if Peek() activable is false -> turn it to last queue
+            {
+                var i = skillQueue.Dequeue();
+                skillQueue.Enqueue(i);
+                limit--;
+            }
 
             timer = Random.Range(1.5f, 3f); //new timer
         }
@@ -219,11 +229,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
         void Transformer() //Treant: Transformerrrrrrrr
         {
             //animation parameter "isTransformer"
+            skillQueue.Clear();
+            FillSkillQueue();
             animator.SetBool("isTransformer", true);
-            StartCoroutine(W());
+            StartCoroutine(Wait());
         }
 
-        IEnumerator W()
+        IEnumerator Wait()
         {
             yield return new WaitForSeconds(0.25f);
 
@@ -338,14 +350,14 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 reachedEndOfPath = false;
             }
 
-            var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
-
-            if (skills[skillQueue.Peek()].Range == -1f || Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[skillQueue.Peek()].Range)
+            if (/*skillQueue.Count != 0 &&*/ (skills[skillQueue.Peek()].Range == -1f || Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[skillQueue.Peek()].Range))
             {
                 if (timer <= 0 && skillActivable[skillQueue.Peek()]) ActiveSkillQueue();
+                animator.SetFloat("speed", 0f);
                 return;
             }
 
+            var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
             var vectorSpeed = direction * speed * Time.fixedDeltaTime;
             rigid.velocity = new Vector2(vectorSpeed.x, vectorSpeed.y);
             animator.SetFloat("speed", Mathf.Abs(vectorSpeed.x) + Mathf.Abs(vectorSpeed.y));
@@ -374,5 +386,11 @@ namespace Assets.Scripts.Both.Creature.Controllers
             currentWayPoint = 0;
         }
         #endregion
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            StopAllCoroutines();
+        }
     }
 }

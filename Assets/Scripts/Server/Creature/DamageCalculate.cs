@@ -3,6 +3,7 @@ using Assets.Scripts.Both.DynamicObject;
 using Assets.Scripts.Both.Scriptable;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -37,7 +38,9 @@ namespace Assets.Scripts.Server.Creature
 
             if (attacker.tag.Equals("Bullet"))
             {
-                creature.GetStats(StatsType.Health).SetValue(-damage + (creature.GetStats(StatsType.Defense).GetValue() / 2));
+                damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
+                creature.GetStats(StatsType.Health).SetValue(-damage);
+                DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
                 //knockback??
             }
             else // attaker is Creature
@@ -57,6 +60,7 @@ namespace Assets.Scripts.Server.Creature
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
 
                 creature.GetStats(StatsType.Health).SetValue(-damage);
+                DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
                 (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, atkerRigid.mass*2, .75f);
             }         
         }
@@ -75,7 +79,21 @@ namespace Assets.Scripts.Server.Creature
             damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;*/
 
             creature.GetStats(StatsType.Health).SetValue(-damage);
+            DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
             (creature as Both.Creature.Creature).AddComponent<ImmunStats>().Setup(StatsType.Health, 0.5f);
+        }
+
+        private void DamageUI(Vector3 worldPosition, int damage)
+        {
+            var obj = GameController.Instance.InstantiateGameObject("DynamicObject/DamageText", null);
+
+            obj.transform.localPosition = worldPosition;
+
+            obj.GetComponentInChildren<TMP_Text>().text = "-" + damage.ToString();
+
+            GameController.Instance.SpawnGameObject(obj, true);
+
+            obj.GetComponent<AutoDestroy>().Setup(0.5f);
         }
     }
 }

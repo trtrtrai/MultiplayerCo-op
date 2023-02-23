@@ -42,7 +42,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             (creature as Creature).StatsChange += (o, a) => { if (a.Type.Name.Equals(StatsType.Speed.ToString())) speed = a.NewValue; };
 
             skills = creature.GetSkills();
-            timer = 0;
+            timer = Time.realtimeSinceStartup;
 
             //init animation
             IsUpdateAnimation = true;
@@ -74,10 +74,10 @@ namespace Assets.Scripts.Both.Creature.Controllers
             MoveTarget();
 
             //Skill choice
-            if (timer > 0)
+            /*if (Time.realtimeSinceStartup >= timer)
             {
-                timer -= Time.fixedDeltaTime;
-            }
+                timer = Time.realtimeSinceStartup + skills[0].Cooldown;
+            }*/
 
             //Animation
             if (!IsUpdateAnimation) return;
@@ -128,9 +128,10 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
 
-            if (Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[0].Range)
+            if (Time.realtimeSinceStartup >= timer && Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[0].Range)
             {
                 Attack();
+                animator.SetFloat("speed", 0);
                 return;
             }
 
@@ -150,7 +151,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             creature.ActivateSkill(0, () => { }, target);
 
-            timer = skills[0].Cooldown;
+            timer = Time.realtimeSinceStartup + skills[0].Cooldown;
         }
 
         private void UpdatePath()

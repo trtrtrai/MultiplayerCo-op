@@ -52,6 +52,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
             if (obj.tag.Equals("Bullet"))
             {
+                if (!obj.GetComponent<NetworkObject>().IsSpawned) return;
                 obj.GetComponent<NetworkObject>().Despawn();
                 Destroy(obj);
             }

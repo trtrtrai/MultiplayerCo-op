@@ -28,6 +28,8 @@ MonoBehaviour:
     BulletAmount: 3
     Direction: 1
     StatsType: 0
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0

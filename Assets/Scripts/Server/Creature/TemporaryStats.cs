@@ -24,7 +24,7 @@ namespace Assets.Scripts.Server.Creature
 
         private IEnumerator ResetTemporary(float secs)
         {
-            yield return new WaitForSecondsRealtime(secs);
+            yield return new WaitForSeconds(secs);
 
             stats.SetTemporary(-temp);
             Destroy(gameObject);
