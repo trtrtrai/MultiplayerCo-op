@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Creature;
+using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.DynamicObject;
 using Assets.Scripts.Both.Scriptable;
 using System.Collections.Generic;
@@ -39,8 +40,8 @@ namespace Assets.Scripts.Server.Creature
             if (attacker.tag.Equals("Bullet"))
             {
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
-                creature.GetStats(StatsType.Health).SetValue(-damage);
-                DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
+                
+                SetDamage(creature, attacker.transform.localPosition, damage);
                 //knockback??
             }
             else // attaker is Creature
@@ -59,8 +60,7 @@ namespace Assets.Scripts.Server.Creature
                 //Defense reduce
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
 
-                creature.GetStats(StatsType.Health).SetValue(-damage);
-                DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
+                SetDamage(creature, attacker.transform.localPosition, damage);
                 (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, atkerRigid.mass*2, .75f);
             }         
         }
@@ -76,24 +76,29 @@ namespace Assets.Scripts.Server.Creature
             }
 
             /*//Defense reduce
-            damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;*/
+            damage -= creature.GetStats(StatsType.Defense).GetValue() / 3;*/
 
-            creature.GetStats(StatsType.Health).SetValue(-damage);
-            DamageUI((creature as NetworkBehaviour).transform.localPosition, damage);
+            SetDamage(creature, attacker.transform.localPosition, damage);
             (creature as Both.Creature.Creature).AddComponent<ImmunStats>().Setup(StatsType.Health, 0.5f);
         }
 
-        private void DamageUI(Vector3 worldPosition, int damage)
+        private void SetDamage(ICreature creature, Vector3 atkerPos, int damage)
+        {
+            creature.GetStats(StatsType.Health).SetValue(-damage);
+            DamageUI((creature as NetworkBehaviour).transform.localPosition, atkerPos, damage);
+        }
+
+        private void DamageUI(Vector3 worldPosition, Vector3 atkerPos, int damage)
         {
             var obj = GameController.Instance.InstantiateGameObject("DynamicObject/DamageText", null);
 
             obj.transform.localPosition = worldPosition;
 
-            obj.GetComponentInChildren<TMP_Text>().text = "-" + damage.ToString();
+            //obj.GetComponentInChildren<TMP_Text>().text = "-" + damage.ToString();
 
             GameController.Instance.SpawnGameObject(obj, true);
 
-            obj.GetComponent<AutoDestroy>().Setup(0.5f);
+            obj.AddComponent<DamageText>().Setup(worldPosition - atkerPos, damage);
         }
     }
 }

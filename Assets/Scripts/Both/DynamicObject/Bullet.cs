@@ -26,7 +26,7 @@ namespace Assets.Scripts.Both.DynamicObject
 
         private void FixedUpdate()
         {
-            rigid.velocity = direction * speed * Time.fixedDeltaTime;
+            rigid.velocity = speed * Time.fixedDeltaTime * direction;
         }
 
         private void OnTriggerEnter2D(Collider2D collision)

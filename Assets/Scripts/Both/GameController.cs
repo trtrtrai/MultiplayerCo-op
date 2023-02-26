@@ -17,6 +17,7 @@ using Unity.VisualScripting;
 using Newtonsoft.Json;
 using System.IO;
 using Assets.Scripts.Server.Creature;
+using Assets.Scripts.Client;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -343,6 +344,15 @@ public class GameController : NetworkBehaviour
                 }
             });
             //Debug.Log(creatures.Length);
+
+            var skillUI = FindObjectsOfType(typeof(SkillUI));
+            var skills = playerObj.GetComponentsInChildren<SkillActive>();
+            
+            for (int i = 0; i < skillUI.Length; i++)
+            {
+                //Debug.Log(skillUI[i].name);
+                (skillUI[i] as SkillUI).Setup(skills[int.Parse(skillUI[i].name)]);
+            }
         }
     }
 

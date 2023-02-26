@@ -26,6 +26,7 @@ MonoBehaviour:
     EffectNumber: 2
     AddOrMultiple: 1
     BulletAmount: 3
+    BulletRadian: 15
     Direction: 1
     StatsType: 0
     SPlace: 0

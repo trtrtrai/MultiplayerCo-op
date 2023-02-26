@@ -23,6 +23,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         // Attack tag
         public bool AddOrMultiple; //true is multiple
         public int BulletAmount; //Bullet
+        public int BulletRadian; //Bullet
         public CastDirection Direction; //Bullet
 
         // Effect tag
@@ -32,6 +33,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         public SummonPlace SPlace; //Summon
         public string SummonCreature; //Summon
         public int SummonAmount; //Summon
+        //Vector2 Offset Summon??
         public TeleportPlace TPlace; //Teleport. true -> caster always teleport on this point instead of touch obstacles
         public float Distance; //Teleport
     }

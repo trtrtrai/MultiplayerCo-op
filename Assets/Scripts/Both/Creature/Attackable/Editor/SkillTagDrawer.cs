@@ -43,10 +43,13 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
 
                 if (atkIndex == 1)
                 {
-                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("BulletAmount"))),
                     property.FindPropertyRelative("BulletAmount"), new GUIContent("BulletAmount"));
                     line++;
-                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AddOrMultiple"))),
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("BulletRadian"))),
+                    property.FindPropertyRelative("BulletRadian"), new GUIContent("BulletRadian"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Direction"))),
                     property.FindPropertyRelative("Direction"), new GUIContent("Direction"));
                     line++;
                 }

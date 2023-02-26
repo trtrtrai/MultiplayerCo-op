@@ -20,6 +20,9 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         protected SkillPackageEventArg current;
 
+        public bool CanActive => canActive;
+        public float Timer => timer;
+
         public virtual void SetupSkill()
         {
             //Debug.Log("SkillActive Start");
@@ -53,7 +56,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             if (skillTags[0].Tag == TagType.Special && skillTags[0].Special == SpecialTag.Summon)
             {
                 var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creatureSkill.SkillName.ToString(), null);
-                if (skillObj != null)
+                if (skillObj != null && current.Target != null)
                 {
                     var position = FindSpawningPlace(current.Target.transform).localPosition;
                     skillObj.transform.localPosition = position;
@@ -75,14 +78,14 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         private IEnumerator CDSkill(Action callback)
         {
             // It wrong time, 17.5s --> 6.72s????
-            /*while (timer > 0f)
+            while (timer > 0f)
             {
-                timer -= Time.fixedDeltaTime; // - something...
+                timer -= Time.fixedDeltaTime / 2f; // - something...
 
                 yield return null;
-            }*/
+            }
 
-            yield return new WaitForSeconds(timer);
+            //yield return new WaitForSeconds(timer);
 
             ResetSkill();
             callback();

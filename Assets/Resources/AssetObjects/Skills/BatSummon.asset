@@ -26,8 +26,11 @@ MonoBehaviour:
     EffectNumber: 0
     AddOrMultiple: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
     StatsType: 0
-    Place: 0
+    SPlace: 0
     SummonCreature: Bat
     SummonAmount: 3
+    TPlace: 0
+    Distance: 0

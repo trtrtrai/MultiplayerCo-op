@@ -27,8 +27,11 @@ MonoBehaviour:
     EffectNumber: 1.5
     AddOrMultiple: 1
     BulletAmount: 1
+    BulletRadian: 0
     Direction: 0
     StatsType: 0
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0
