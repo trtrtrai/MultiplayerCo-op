@@ -24,13 +24,13 @@ namespace Assets.Scripts.Client
             btnServer.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyServer(false);
-                NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene("Room", LoadSceneMode.Single);
             });
 
             btnHost.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyServer(true);
-                NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene("Room", LoadSceneMode.Single);
             });
 
             btnClient.onClick.AddListener(() =>

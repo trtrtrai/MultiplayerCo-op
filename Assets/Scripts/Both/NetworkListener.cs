@@ -1,10 +1,8 @@
 using Assets.Scripts.Both.Scriptable;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-
 namespace Assets.Scripts.Both
 {
     public class NetworkListener : MonoBehaviour
@@ -31,7 +29,7 @@ namespace Assets.Scripts.Both
 
         public bool StartMyClient()
         {
-            var success = NetworkManager.Singleton.StartClient();Debug.Log("Client connect status " + success);
+            var success = NetworkManager.Singleton.StartClient();//Debug.Log("Client connect status " + success);
             if (success)
             {
                 NetworkManager.Singleton.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
@@ -41,6 +39,14 @@ namespace Assets.Scripts.Both
 
         private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
         {
+            /*if (sceneEvent.SceneName.Equals("PlayGame")) Debug.Log("PG");
+            if (sceneEvent.SceneName.Equals("Room"))
+            {
+                Debug.Log("R");
+                //if (GameObject.Find("StartGame") is null) { Debug.Log("null"); return; }
+                //GameObject.FindGameObjectWithTag("Stand").GetComponent<Button>().onClick.AddListener(() => NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single));
+            }*/
+
             // Both client and server receive these notifications
             switch (sceneEvent.SceneEventType)
             {
@@ -82,38 +88,53 @@ namespace Assets.Scripts.Both
                             {
                                 // Handle server side LoadComplete related tasks here
                                 Debug.Log("Server load completed");
-                                //Spawn GameManager
-                                var gameCtroller = Instantiate(Resources.Load<GameObject>("Manager/GameController"));
-                                GameController.Instance.SpawnGameObject(gameCtroller, true);
 
-                                var creatureContruct = GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
-                                GameController.Instance.SpawnGameObject(creatureContruct, true);
+                                if (sceneEvent.SceneName.Equals("PlayGame"))
+                                {
+                                    //Spawn GameManager
+                                    var gameCtroller = Instantiate(Resources.Load<GameObject>("Manager/GameController"));
+                                    GameController.Instance.SpawnGameObject(gameCtroller, true);
 
-                                GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
-                                GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);
+                                    var creatureContruct = GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
+                                    GameController.Instance.SpawnGameObject(creatureContruct, true);
 
-                                var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
-                                GameController.Instance.SpawnGameObject(cmr);
+                                    GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
+                                    GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);
 
-                                GameController.Instance.BossSpawn(BossName.Treant);
+                                    var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
+                                    GameController.Instance.SpawnGameObject(cmr);
+
+                                    GameController.Instance.BossSpawn(BossName.Treant);
+                                }
+
+                                if (sceneEvent.SceneName.Equals("Room"))
+                                {
+                                    var roomCtroller = Instantiate(Resources.Load<GameObject>("Manager/RoomController"));
+                                    roomCtroller.GetComponent<RoomController>().NetworkObject.Spawn(true);
+                                    //Debug.Log(roomCtroller.GetComponent<NetworkObject>().IsSpawned);
+                                    RoomController.Instance.SetupRoom();
+                                }
+
                                 if (NetworkManager.Singleton.IsHost)
                                 {
                                     Debug.Log("Server is also host");
-                                    GameController.Instance.SpawnPlayerServerRpc(sceneEvent.ClientId);
+
+                                    if (sceneEvent.SceneName.Equals("PlayGame")) GameController.Instance.SpawnPlayerServerRpc(sceneEvent.ClientId);
+                                    if (sceneEvent.SceneName.Equals("Room")) RoomController.Instance.PlayerLoadCompletedServerRpc(sceneEvent.ClientId);
                                 }
                             }
                             else
                             {
                                 // Handle client LoadComplete **server-side** notifications here
                                 Debug.Log("Server side client load " + sceneEvent.ClientId + " completed");
-                            }
+                            }                    
                         }
                         else // Clients generate this notification locally
                         {
                             // Handle client side LoadComplete related tasks here
                             Debug.Log("Client load " + sceneEvent.ClientId + " completed");
 
-                            StartCoroutine(Wait(sceneEvent.ClientId));
+                            StartCoroutine(Wait(sceneEvent.ClientId, sceneEvent.SceneName));
                         }
 
                         // So you can use sceneEvent.ClientId to also track when clients are finished loading a scene
@@ -172,14 +193,31 @@ namespace Assets.Scripts.Both
             }
         }
 
-        private IEnumerator Wait(ulong clientId)
+        private IEnumerator Wait(ulong clientId, string sceneName)
         {
-            while (GameController.Instance is null)
+            switch (sceneName)
             {
-                yield return null;
-            }
+                case "PlayGame":
+                    {
+                        while (GameController.Instance is null)
+                        {
+                            yield return null;
+                        }
 
-            GameController.Instance.SpawnPlayerServerRpc(clientId);
+                        if (sceneName.Equals("PlayGame")) GameController.Instance.SpawnPlayerServerRpc(clientId);
+                        break;
+                    }
+                case "Room":
+                    {
+                        while (RoomController.Instance is null)
+                        {
+                            yield return null;
+                        }
+
+                        if (sceneName.Equals("Room")) RoomController.Instance.PlayerLoadCompletedServerRpc(clientId);
+                        break;
+                    }
+            }   
         }
 
         private void OnDestroy()

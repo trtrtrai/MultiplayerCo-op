@@ -18,6 +18,8 @@ using Newtonsoft.Json;
 using System.IO;
 using Assets.Scripts.Server.Creature;
 using Assets.Scripts.Client;
+using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -99,7 +101,7 @@ public class GameController : NetworkBehaviour
 
         CreatureBuilder builder = new CharacterBuilder();
         CreatureDirector.Instance.Builder = builder;
-        CreatureDirector.Instance.CharacterBuild(CharacterClass.TankerSlash_model);
+        CreatureDirector.Instance.CharacterBuild(CharacterClass.FighterSword_model);
 
         var rs = builder.Release();
         var playerTransform = (rs as NetworkBehaviour).transform;

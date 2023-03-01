@@ -13,6 +13,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
         SunBoost,
         Dash,
         TeleDash,
+        Sword
     }
 
     public enum TagType

@@ -17,7 +17,7 @@ namespace Assets.Scripts.Both.DynamicObject
 
         private void FixedUpdate()
         {
-            GetComponent<RectTransform>().position = Vector3.Lerp(GetComponent<RectTransform>().position, GetComponent<RectTransform>().position + direction, .8f);
+            GetComponent<RectTransform>().position = Vector3.Lerp(GetComponent<RectTransform>().position, GetComponent<RectTransform>().position + direction, .2f);
         }
     }
 }

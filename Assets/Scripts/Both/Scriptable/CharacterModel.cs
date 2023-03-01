@@ -13,9 +13,9 @@ namespace Assets.Scripts.Both.Scriptable
         TankerSlash_model,
         FighterSword_model,
         FighterSpear_model,
-        MagicianTeleport_model,
+        /*MagicianTeleport_model,
         MagicianSummon_model,
-        PriestHealing_model,
+        PriestHealing_model,*/
     }
 
     public enum BossName

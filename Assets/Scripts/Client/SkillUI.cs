@@ -29,6 +29,8 @@ namespace Assets.Scripts.Client
 
         private void FixedUpdate()
         {
+            if (skill is null) return;
+
             if (!skill.CanActive && skill.Timer < timer)
             {
                 if (!imgCD.enabled) imgCD.enabled = true;
