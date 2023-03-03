@@ -25,9 +25,13 @@ MonoBehaviour:
     Duration: 15
     EffectNumber: 2
     AddOrMultiple: 1
+    IsNormal: 0
     BulletAmount: 3
     BulletRadian: 15
     Direction: 1
+    AreaType: 0
+    ObjName: FireBall
+    PerSeconds: 0
     StatsType: 0
     SPlace: 0
     SummonCreature: 

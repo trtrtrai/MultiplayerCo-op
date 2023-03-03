@@ -101,7 +101,7 @@ public class GameController : NetworkBehaviour
 
         CreatureBuilder builder = new CharacterBuilder();
         CreatureDirector.Instance.Builder = builder;
-        CreatureDirector.Instance.CharacterBuild(CharacterClass.FighterSword_model);
+        CreatureDirector.Instance.CharacterBuild(CharacterClass.MagicianAttack_model);
 
         var rs = builder.Release();
         var playerTransform = (rs as NetworkBehaviour).transform;
@@ -142,7 +142,7 @@ public class GameController : NetworkBehaviour
     public bool? CreatureTagDetect(string ownerTag, string collisionTag)
     {
         if (collisionTag.Equals("Mobs")) return true; //always take damage
-        if (collisionTag.Equals(ownerTag)) return false;
+        if (collisionTag.Equals(ownerTag) || collisionTag.Equals("Spell")) return false;
 
         switch (collisionTag)
         {

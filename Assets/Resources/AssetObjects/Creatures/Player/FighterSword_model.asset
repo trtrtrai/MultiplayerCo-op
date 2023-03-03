@@ -17,13 +17,13 @@ MonoBehaviour:
   - Type: 0
     Amount: 500
   - Type: 1
-    Amount: 70
+    Amount: 50
   - Type: 2
-    Amount: 35
+    Amount: 39
   - Type: 3
-    Amount: 269
+    Amount: 222
   - Type: 4
-    Amount: 21
+    Amount: 17
   SkillSlot: 3
   TouchDamage: 0
   Classify: 1

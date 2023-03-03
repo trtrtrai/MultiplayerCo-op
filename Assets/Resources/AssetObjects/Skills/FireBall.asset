@@ -16,7 +16,7 @@ MonoBehaviour:
   Description: Shoot a fireball on current caster's direction with 150% caster's
     strength.
   Range: -1
-  CastDelay: 0.25
+  CastDelay: 0
   Cooldown: 7
   SkillTags:
   - Tag: 0
@@ -24,11 +24,15 @@ MonoBehaviour:
     Effect: 0
     Special: 2
     Duration: 15
-    EffectNumber: 1.5
+    EffectNumber: 2
     AddOrMultiple: 1
+    IsNormal: 0
     BulletAmount: 1
     BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: FireBall
+    PerSeconds: 0
     StatsType: 0
     SPlace: 0
     SummonCreature: 

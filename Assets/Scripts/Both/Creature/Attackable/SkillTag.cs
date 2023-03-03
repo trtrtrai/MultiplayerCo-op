@@ -22,12 +22,17 @@ namespace Assets.Scripts.Both.Creature.Attackable
 
         // Attack tag
         public bool AddOrMultiple; //true is multiple
+        public bool IsNormal; //Bullet
         public int BulletAmount; //Bullet
         public int BulletRadian; //Bullet
         public CastDirection Direction; //Bullet
+        public AreaType AreaType; //Area tags
+        public string ObjName; //Area tags + Bullet
+        public float PerSeconds; //Self Area
+        //public bool isFollow //Self Area
 
         // Effect tag
-        public StatsType StatsType;
+        public StatsType StatsType; // Effect tag + Self Area
 
         // Special tag
         public SummonPlace SPlace; //Summon

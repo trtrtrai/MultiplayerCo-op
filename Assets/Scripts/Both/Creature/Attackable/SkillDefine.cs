@@ -13,7 +13,9 @@ namespace Assets.Scripts.Both.Creature.Attackable
         SunBoost,
         Dash,
         TeleDash,
-        Sword
+        Sword,
+        EnergyBall,
+        HealingZone
     }
 
     public enum TagType
@@ -63,5 +65,11 @@ namespace Assets.Scripts.Both.Creature.Attackable
     {
         Orientation,
         Direction,
+    }
+
+    public enum AreaType
+    {
+        Instance,
+        PerSeconds
     }
 }

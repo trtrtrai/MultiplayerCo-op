@@ -15,6 +15,7 @@ TagManager:
   - Mobs
   - SpecialPoint
   - Stand
+  - Spell
   layers:
   - Default
   - TransparentFX

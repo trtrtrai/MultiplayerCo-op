@@ -1,6 +1,8 @@
 {
 "TankerSlash":["Slash","Shield","Dash"],
 "FighterSword":["Sword","Ragnarok","Dash"],
+"MagicianAttack":["EnergyBall","FireBall","TeleDash"],
+"PriestHealing":["EnergyBall","HealingZone","TeleDash"],
 "Treant":["TreeAttack","BatSummon","TriFireBall","SunBoost"],
 "Bat":["BatBite"],
 

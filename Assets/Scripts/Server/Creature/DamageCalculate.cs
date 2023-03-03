@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Creature
@@ -80,6 +81,14 @@ namespace Assets.Scripts.Server.Creature
 
             SetDamage(creature, attacker.transform.localPosition, damage);
             (creature as Both.Creature.Creature).AddComponent<ImmunStats>().Setup(StatsType.Health, 0.5f);
+        }
+
+        public void BuffTo(ICreature creature, int amount, StatsType type)
+        {
+            if (creature is null) return;
+
+            creature.GetStats(type).SetValue(amount);
+            DamageUI((creature as NetworkBehaviour).transform.localPosition, (creature as NetworkBehaviour).transform.localPosition + Vector3.down, amount);
         }
 
         private void SetDamage(ICreature creature, Vector3 atkerPos, int damage)

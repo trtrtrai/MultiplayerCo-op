@@ -120,6 +120,20 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     {
                         if (args.Target is null) return;
 
+                        if (tag.IsNormal)
+                        {
+                            var anim = args.Caster.GetComponent<Animator>();
+                            try
+                            {
+                                anim.SetBool("isAttack", true);
+                                StartCoroutine(Wait(.5f, () => { if (anim != null) anim.SetBool("isAttack", false); }));
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+
                         var directionEven = tag.Direction == CastDirection.Orientation ? GetSkillDirection(args.Caster.GetComponent<Animator>()) : (Vector2)(args.Target.localPosition - args.Caster.localPosition);
                         var radEven = tag.BulletRadian / 180f; //pos rad
 
@@ -148,6 +162,29 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     }
                 case AttackTag.SelfArea:
                     {
+                        switch (tag.AreaType)
+                        {
+                            case AreaType.Instance:
+                                {
+                                    break;
+                                }
+                            case AreaType.PerSeconds:
+                                {
+                                    var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + tag.ObjName, null);
+                                    if (skillObj != null)
+                                    {
+                                        var position = args.Caster.localPosition; //Self --> cater pos
+                                        skillObj.transform.localPosition = position;
+  
+                                        GameController.Instance.SpawnGameObject(skillObj, true);
+                                        skillObj.GetComponent<StatsPerSeconds>().Setup(30, tag.PerSeconds, tag.StatsType, creature, GetCreatureTag(args.Caster.tag));
+                                        skillObj.AddComponent<AutoDestroy>().Setup(tag.Duration);
+                                    }
+
+                                    break;
+                                }
+                        }
+
                         break;
                     }
                 case AttackTag.TargetArea:
@@ -158,7 +195,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
 
             static void FireBullet(ICreature creature, SkillTag tag, Vector2 direction, SkillPackageEventArg args)
             {
-                var bullet = CreateBullet(direction, args);
+                var bullet = CreateBullet(tag.ObjName, direction, args);
 
                 IBulletInitial script = bullet.GetComponent<Bullet>();
 
@@ -177,9 +214,9 @@ namespace Assets.Scripts.Server.Creature.Attackable
                 GameController.Instance.SpawnGameObject(bullet, true);
             }
 
-            static GameObject CreateBullet(Vector2 direction, SkillPackageEventArg args)
+            static GameObject CreateBullet(string bulletName, Vector2 direction, SkillPackageEventArg args)
             {
-                var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/Bullet"));
+                var bullet = Instantiate(Resources.Load<GameObject>("DynamicObject/Bullet/" + bulletName));
 
                 bullet.transform.localPosition = args.Caster.transform.localPosition + (Vector3)(args.CastPlace * direction);
 
@@ -280,47 +317,47 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         break;
                     }
             }
+        }
 
-            static void Summon(string name, Vector3 position, SkillPackageEventArg args)
+        private void Summon(string name, Vector3 position, SkillPackageEventArg args)
+        {
+            var critter = GameController.Instance.CreatureInstantiate(name);
+            critter.tag = GetCreatureTag(args.Caster.tag);
+
+            critter.transform.localPosition = position;
+
+            var script = critter.GetComponent<Both.Creature.Creature>();
+            GameController.Instance.SpawnCreature(script, critter.tag, true);
+        }
+
+        private string GetCreatureTag(string casterTag)
+        {
+            switch (casterTag)
             {
-                var critter = GameController.Instance.CreatureInstantiate(name);
-                critter.tag = GetCreatureTag(args.Caster.tag);
-
-                critter.transform.localPosition = position;
-
-                var script = critter.GetComponent<Both.Creature.Creature>();
-                GameController.Instance.SpawnCreature(script, critter.tag, true);
+                case "Character":
+                    {
+                        return "Ally";
+                    }
+                case "Boss":
+                    {
+                        return "Enemy";
+                    }
+                case "Mobs":
+                    {
+                        return "Mobs";
+                    }
+                case "Enemy":
+                    {
+                        return "Enemy";
+                    }
+                case "Ally":
+                    {
+                        return "Ally";
+                    }
             }
 
-            static string GetCreatureTag(string casterTag)
-            {
-                switch (casterTag)
-                {
-                    case "Character":
-                        {
-                            return "Ally";
-                        }
-                    case "Boss":
-                        {
-                            return "Enemy";
-                        }
-                    case "Mobs":
-                        {
-                            return "Mobs";
-                        }
-                    case "Enemy":
-                        {
-                            return "Enemy";
-                        }
-                    case "Ally":
-                        {
-                            return "Ally";
-                        }
-                }
-
-                return "Mobs";
-            } //for summon creature
-        }
+            return "Mobs";
+        } //for summon creature
 
         private Vector2 GetSkillDirection(Animator animator)
         {

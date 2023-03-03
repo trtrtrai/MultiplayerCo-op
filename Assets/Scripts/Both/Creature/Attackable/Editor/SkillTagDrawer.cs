@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Both.Creature.Attackable.Editor
 {
@@ -43,6 +44,12 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
 
                 if (atkIndex == 1)
                 {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("ObjName"))),
+                    property.FindPropertyRelative("ObjName"), new GUIContent("ObjectName"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("IsNormal"))),
+                    property.FindPropertyRelative("IsNormal"), new GUIContent("IsNormal"));
+                    line++;
                     EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("BulletAmount"))),
                     property.FindPropertyRelative("BulletAmount"), new GUIContent("BulletAmount"));
                     line++;
@@ -51,6 +58,27 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                     line++;
                     EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Direction"))),
                     property.FindPropertyRelative("Direction"), new GUIContent("Direction"));
+                    line++;
+                }
+                else if (atkIndex == 2)
+                {
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("AreaType"))),
+                    property.FindPropertyRelative("AreaType"), new GUIContent("AreaType"));
+                    line++;
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("ObjName"))),
+                    property.FindPropertyRelative("ObjName"), new GUIContent("ObjectName"));
+                    line++;
+
+                    var areaType = property.FindPropertyRelative("AreaType").enumValueIndex;
+
+                    if (areaType == 1)
+                    {
+                        EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("PerSeconds"))),
+                        property.FindPropertyRelative("PerSeconds"), new GUIContent("PerSeconds"));
+                        line++;
+                    }
+                    EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("StatsType"))),
+                    property.FindPropertyRelative("StatsType"), new GUIContent("StatsType"));
                     line++;
                 }
             }
@@ -123,5 +151,13 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
 
             EditorGUI.EndProperty();
         }
+
+        /*private void DrawProperty(string name, ref int line, string nameUI = "")
+        {
+            EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("Special"))),
+            property.FindPropertyRelative("Special"),
+                    new GUIContent("Special type"));
+            line++;
+        }*/
     }
 }
