@@ -19,6 +19,7 @@ namespace Assets.Scripts.Client
             if (GameObject.FindGameObjectWithTag("DDOL") is null)
             {
                 Instantiate(Resources.Load<GameObject>("Manager/NetworkManager"));
+                NetworkManager.Singleton.SetSingleton();
             }
 
             btnServer.onClick.AddListener(() =>
@@ -37,6 +38,13 @@ namespace Assets.Scripts.Client
             {
                 NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyClient();
             });
+        }
+
+        private void OnDestroy()
+        {
+            btnServer.onClick.RemoveAllListeners();
+            btnHost.onClick.RemoveAllListeners();
+            btnClient.onClick.RemoveAllListeners();
         }
     }
 }

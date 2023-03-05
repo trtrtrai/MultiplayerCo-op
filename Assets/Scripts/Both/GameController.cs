@@ -18,8 +18,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Assets.Scripts.Server.Creature;
 using Assets.Scripts.Client;
-using UnityEngine.UI;
-using TMPro;
+using Assets.Scripts.Both;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -101,7 +100,11 @@ public class GameController : NetworkBehaviour
 
         CreatureBuilder builder = new CharacterBuilder();
         CreatureDirector.Instance.Builder = builder;
-        CreatureDirector.Instance.CharacterBuild(CharacterClass.MagicianAttack_model);
+        var cIndex = NetworkListener.Lobby[clientId];
+        /*RoomController.Instance.NetworkObject.Despawn();
+        Destroy(RoomController.Instance.gameObject);*/
+        
+        CreatureDirector.Instance.CharacterBuild(Enum.GetName(typeof(CharacterClass), cIndex));
 
         var rs = builder.Release();
         var playerTransform = (rs as NetworkBehaviour).transform;

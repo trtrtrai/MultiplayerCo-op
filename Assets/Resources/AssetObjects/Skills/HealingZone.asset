@@ -30,7 +30,7 @@ MonoBehaviour:
     BulletRadian: 0
     Direction: 0
     AreaType: 1
-    ObjName: 
+    ObjName: HealingZone
     PerSeconds: 0.5
     StatsType: 0
     SPlace: 0

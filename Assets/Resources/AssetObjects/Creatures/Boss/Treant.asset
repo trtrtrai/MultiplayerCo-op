@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a620c939203532d40bb749cf5131e115, type: 3}
   m_Name: Treant
   m_EditorClassIdentifier: 
-  CreatureName: Treant Boss
+  CreatureName: Treant
   Status:
   - Type: 0
     Amount: 1000

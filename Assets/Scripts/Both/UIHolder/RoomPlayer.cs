@@ -8,6 +8,8 @@ public class RoomPlayer : MonoBehaviour
 {
     public GameObject UIContainer;
     public GameObject ButtonContainer;
+    public bool OnUse;
+    public bool IsOwner;
 
     public TMP_Text CharacterLabel;
     public Image CharacterImage;

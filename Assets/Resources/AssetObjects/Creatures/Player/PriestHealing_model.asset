@@ -15,7 +15,7 @@ MonoBehaviour:
   CreatureName: Priest Healing
   Status:
   - Type: 0
-    Amount: 2000
+    Amount: 400
   - Type: 1
     Amount: 27
   - Type: 2
@@ -26,4 +26,4 @@ MonoBehaviour:
     Amount: 10
   SkillSlot: 3
   TouchDamage: 0
-  Classify: 0
+  Classify: 3

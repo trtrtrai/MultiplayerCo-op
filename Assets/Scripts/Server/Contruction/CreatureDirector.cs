@@ -31,13 +31,13 @@ namespace Assets.Scripts.Server.Contruction
 
         public CreatureBuilder Builder { set => builder = value; }
 
-        public void CharacterBuild(CharacterClass charClass)
+        public void CharacterBuild(string charClass)
         {
             //Game Object
-            builder.InstantiateGameObject(charClass.ToString());
+            builder.InstantiateGameObject(charClass);
 
             //Load scriptable object
-            var script = Resources.Load<CharacterModel>(path + "Player/" + charClass.ToString());
+            var script = Resources.Load<CharacterModel>(path + "Player/" + charClass);
 
             //Init property
             builder.GiveName(script.CreatureName);
@@ -57,7 +57,7 @@ namespace Assets.Scripts.Server.Contruction
             attackable.SkillSlot = script.SkillSlot;
 
             //Instantiate skills
-            var skillName = GameController.Instance.GetCreatureSkill(charClass.ToString().Replace("_model", ""));
+            var skillName = GameController.Instance.GetCreatureSkill(charClass.Replace("_model", ""));
             var skills = new List<Skill>();
 
             skillName.ForEach(s => skills.Add(new Skill(Resources.Load<SkillModel>("AssetObjects/Skills/" + s.ToString()))));

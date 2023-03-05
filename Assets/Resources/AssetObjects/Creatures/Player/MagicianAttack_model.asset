@@ -26,4 +26,4 @@ MonoBehaviour:
     Amount: 35
   SkillSlot: 3
   TouchDamage: 0
-  Classify: 0
+  Classify: 2

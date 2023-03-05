@@ -1,4 +1,6 @@
+using Assets.Scripts.Both;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -11,6 +13,7 @@ public class RoomController : NetworkBehaviour
     
     // Lobby[LocalClientId][CharacterIndex]
     private Dictionary<ulong, int> lobby = new Dictionary<ulong, int>();
+    public Scene Room;
 
     [SerializeField] private RoomButton script;
 
@@ -23,6 +26,7 @@ public class RoomController : NetworkBehaviour
         else
         {
             Instance = this;
+            Room = SceneManager.GetActiveScene();
         }
     }
 
@@ -42,6 +46,7 @@ public class RoomController : NetworkBehaviour
         }
     }
 
+    #region aaa
     [ServerRpc(RequireOwnership = false)]
     public void ChangedCharacterIndexServerRpc(int index, ServerRpcParams serverRpcParams = default)
     {
@@ -166,11 +171,157 @@ public class RoomController : NetworkBehaviour
 
         player.UIContainer.SetActive(true);
         player.ButtonContainer.SetActive(isActiveButton);
+        player.OnUse = true;
+        player.IsOwner = isActiveButton;
     }
+    #endregion
+
+    public Dictionary<ulong, int> GetLobby() => lobby;
 
     public void OutRoom()
     {
+        Debug.Log("Out " + IsServer + " " + IsClient);
+        if (IsServer)
+        {
+            OutRoomAllClientRpc();
+            StartCoroutine(WaitToDisconnectServer());
+        }
+        else if (IsClient) 
+        {
+            Debug.Log("adfs");
+            OutRoomServerRpc(NetworkManager.Singleton.LocalClientId);
+        } 
+    }
+
+    [ClientRpc]
+    private void OutRoomAllClientRpc()
+    {
+        if (IsHost) return;
+        Debug.Log("Out room all");
+
+        DisconnectServerRpc(NetworkManager.Singleton.LocalClientId);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DisconnectServerRpc(ulong clientId)
+    {
+        if (!IsServer) return;
+
+        if (lobby.ContainsKey(clientId))
+        {
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            };
+
+            DisconnectClientRpc(clientRpcParams);
+        }
+    }
+
+    [ClientRpc]
+    private void OutRoomClientRpc(int index, ClientRpcParams clientRpcParams = default)
+    {
+        if (IsHost) return;
+
+        UpdatePlayerGrid(index);
+    }
+
+    private void UpdatePlayerGrid(int index)
+    {
+        Debug.Log("UpdateGrid");
+        int onUseCount = 0; // >=1
+        for (int i = 0; i < script.Players.Count; i++)
+        {
+            if (script.Players[i].OnUse)
+            {
+                onUseCount++;
+            }
+        }
+
+        var player = script.Players[index];
+        if (index == onUseCount - 1)
+        {
+            player.UIContainer.SetActive(false);
+            player.ButtonContainer.SetActive(false);
+            player.OnUse = false;
+        }
+        else if (index < onUseCount - 1)
+        {
+            var offset = index + 1;
+            while (offset < onUseCount) // e.g: index 1 out, onuse = 3 (index 2) --> index 2 become index 1, remove index 2
+            {
+                var nextPlayer = script.Players[offset];
+
+                player.PlayerName.text = nextPlayer.PlayerName.text;
+                player.CharacterIndex = nextPlayer.CharacterIndex;
+                player.UpdateCharacter();
+
+                if (nextPlayer.IsOwner)
+                {
+                    player.IsOwner = true;
+                    nextPlayer.IsOwner = false;
+
+                    player.ButtonContainer.SetActive(true);
+                    nextPlayer.ButtonContainer.SetActive(false);
+                }
+
+                player = nextPlayer;
+                offset++;
+            }
+
+            player.UIContainer.SetActive(false);
+            player.ButtonContainer.SetActive(false);
+            player.OnUse = false;
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void OutRoomServerRpc(ulong clientId)
+    {
+        if (!IsServer) return;
+        if (!lobby.ContainsKey(clientId)) return;
+        Debug.Log("Out room " + clientId);
+        var index = lobby.Keys.ToList().IndexOf(clientId);
+        lobby.Remove(clientId);
+
+        UpdatePlayerGrid(index);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = lobby.Keys.ToArray()
+            }
+        };
+
+        OutRoomClientRpc(index, clientRpcParams);
+
+        clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId}
+            }
+        };
+
+        DisconnectClientRpc(clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void DisconnectClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        Debug.Log("DisconnectClientRpc");
+
+        Instance = null;
         NetworkManager.Singleton.Shutdown();
+
+        if (NetworkManager.Singleton != null)
+        {
+            Destroy(NetworkManager.Singleton.gameObject);
+        }
         SceneManager.LoadScene("GameMenu");
     }
 
@@ -178,6 +329,29 @@ public class RoomController : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        NetworkListener.Lobby = lobby;
         NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single);
+    }
+
+    IEnumerator WaitToDisconnectServer()
+    {
+        while (NetworkManager.ConnectedClients.Count > 1)
+        {
+            yield return null;
+        }
+        Debug.Log("WaitToDisconnectServer");
+        NetworkManager.Singleton.Shutdown();
+
+        if (NetworkManager.Singleton != null)
+        {
+            Destroy(NetworkManager.Singleton.gameObject);
+        }
+        SceneManager.LoadScene("GameMenu");
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        StopAllCoroutines();
     }
 }

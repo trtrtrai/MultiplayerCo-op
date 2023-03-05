@@ -1,12 +1,17 @@
 using Assets.Scripts.Both.Scriptable;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 namespace Assets.Scripts.Both
 {
     public class NetworkListener : MonoBehaviour
     {
+        public static Dictionary<ulong, int> Lobby = new Dictionary<ulong, int>();
+
         public bool StartMyServer(bool isHost)
         {
             var success = false;
@@ -39,14 +44,6 @@ namespace Assets.Scripts.Both
 
         private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
         {
-            /*if (sceneEvent.SceneName.Equals("PlayGame")) Debug.Log("PG");
-            if (sceneEvent.SceneName.Equals("Room"))
-            {
-                Debug.Log("R");
-                //if (GameObject.Find("StartGame") is null) { Debug.Log("null"); return; }
-                //GameObject.FindGameObjectWithTag("Stand").GetComponent<Button>().onClick.AddListener(() => NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single));
-            }*/
-
             // Both client and server receive these notifications
             switch (sceneEvent.SceneEventType)
             {
@@ -134,7 +131,8 @@ namespace Assets.Scripts.Both
                             // Handle client side LoadComplete related tasks here
                             Debug.Log("Client load " + sceneEvent.ClientId + " completed");
 
-                            StartCoroutine(Wait(sceneEvent.ClientId, sceneEvent.SceneName));
+                            if (sceneEvent.SceneName.Equals("Room")) StartCoroutine(Wait(sceneEvent.ClientId, sceneEvent.SceneName));
+                            if (sceneEvent.SceneName.Equals("PlayGame")) StartCoroutine(Wait(sceneEvent.ClientId, sceneEvent.SceneName));
                         }
 
                         // So you can use sceneEvent.ClientId to also track when clients are finished loading a scene
@@ -143,13 +141,38 @@ namespace Assets.Scripts.Both
                 // Handle Client to Server Unload Complete Notification(s)
                 case SceneEventType.UnloadComplete:
                     {
+                        /*Debug.Log("Unload " + sceneEvent.ClientId + " " + sceneEvent.SceneName);
                         // This will let you know when an unload is completed
-                        // You can follow the same pattern above as SceneEventType.LoadComplete here
-
                         // Server Side: receives this notification for both itself and all clients
-                        // Client Side: receives this notification for itself
+                        if (NetworkManager.Singleton.IsServer)
+                        {
+                            if (sceneEvent.ClientId == NetworkManager.Singleton.LocalClientId)
+                            {
+                                // Handle server side LoadComplete related tasks here
+                                Debug.Log("Server unload completed");
 
-                        // So you can use sceneEvent.ClientId to also track when clients are finished unloading a scene
+                                
+
+                                if (NetworkManager.Singleton.IsHost)
+                                {
+                                    Debug.Log("Server is also host");
+                                }
+                            }
+                            else
+                            {
+                                // Handle client LoadComplete **server-side** notifications here
+                                Debug.Log("Server side client unload " + sceneEvent.ClientId + " completed");
+                            }
+                        }
+                        else // Clients generate this notification locally
+                        {
+                            // Handle client side LoadComplete related tasks here
+                            Debug.Log("Client unload " + sceneEvent.ClientId + " completed");
+
+
+                        }*/
+
+                        // So you can use sceneEvent.ClientId to also track when clients are finished loading a scene
                         break;
                     }
                 // Handle Server to Client Load Complete (all clients finished loading notification)
@@ -182,10 +205,12 @@ namespace Assets.Scripts.Both
                             if (NetworkManager.Singleton.IsServer)
                             {
                                 // Handle any server-side tasks here
+                                Debug.Log("Server" + clientId);
                             }
                             else
                             {
                                 // Handle any client-side tasks here
+                                Debug.Log("Client" + clientId);
                             }
                         }
                         break;
@@ -213,7 +238,7 @@ namespace Assets.Scripts.Both
                         {
                             yield return null;
                         }
-
+                        
                         if (sceneName.Equals("Room")) RoomController.Instance.PlayerLoadCompletedServerRpc(clientId);
                         break;
                     }

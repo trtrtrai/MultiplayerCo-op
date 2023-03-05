@@ -35,6 +35,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Awake()
         {
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
+
             animator = GetComponent<Animator>();
             creature = GetComponent<Creature>();
 
@@ -55,6 +57,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
         // Start is called before the first frame update
         void Start()
         {
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
+
             target = FindCharacter();
 
             // get and listen speed

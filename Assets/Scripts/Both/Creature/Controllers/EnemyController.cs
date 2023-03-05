@@ -27,6 +27,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Awake()
         {
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
+
             animator = GetComponent<Animator>();
             creature = GetComponent<Creature>();   
 
@@ -38,6 +40,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         void Start()
         {
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
+
             speed = creature.GetStats(StatsType.Speed).GetValue();
             (creature as Creature).StatsChange += (o, a) => { if (a.Type.Name.Equals(StatsType.Speed.ToString())) speed = a.NewValue; };
 
