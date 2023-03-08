@@ -10,7 +10,7 @@ namespace Assets.Scripts.Both
 {
     public class NetworkListener : MonoBehaviour
     {
-        public static Dictionary<ulong, int> Lobby = new Dictionary<ulong, int>();
+        public static Dictionary<ulong, int> Lobby;
 
         public bool StartMyServer(bool isHost)
         {
@@ -99,7 +99,7 @@ namespace Assets.Scripts.Both
                                     GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);
 
                                     var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
-                                    GameController.Instance.SpawnGameObject(cmr);
+                                    GameController.Instance.SpawnGameObject(cmr, true);
 
                                     GameController.Instance.BossSpawn(BossName.Treant);
                                 }
@@ -110,6 +110,11 @@ namespace Assets.Scripts.Both
                                     roomCtroller.GetComponent<RoomController>().NetworkObject.Spawn(true);
                                     //Debug.Log(roomCtroller.GetComponent<NetworkObject>().IsSpawned);
                                     RoomController.Instance.SetupRoom();
+                                    if (Lobby != null)
+                                    {
+                                        RoomController.Instance.SetLobby(Lobby);
+                                        RoomController.Instance.DrawPlayerGrid();
+                                    }
                                 }
 
                                 if (NetworkManager.Singleton.IsHost)

@@ -14,8 +14,10 @@ TagManager:
   - Ally
   - Mobs
   - SpecialPoint
-  - Stand
   - Spell
+  - BossSpawn
+  - PlayerSpawn
+  - Loading
   layers:
   - Default
   - TransparentFX

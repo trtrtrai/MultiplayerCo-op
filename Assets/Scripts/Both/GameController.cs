@@ -19,6 +19,7 @@ using System.IO;
 using Assets.Scripts.Server.Creature;
 using Assets.Scripts.Client;
 using Assets.Scripts.Both;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -28,6 +29,7 @@ public class GameController : NetworkBehaviour
     public static GameController Instance { get; private set; }
 
     private Dictionary<string, List<SkillName>> skillDict;
+    private int playerCount = 0;
 
     private void Awake()
     {
@@ -90,6 +92,12 @@ public class GameController : NetworkBehaviour
 
         var rs = builder.Release();
 
+        //Find BossSpawn point
+        var bossSpawn = GameObject.FindGameObjectWithTag("BossSpawn");
+        var rigid = (rs as NetworkBehaviour).GetComponent<Rigidbody2D>();
+        //rigid.collisionDetectionMode = CollisionDetectionMode2D.Discrete; // should be, but it is default
+        rigid.MovePosition(bossSpawn.transform.localPosition);
+
         SpawnCreature(rs as Creature, "Boss", true);
     }
 
@@ -101,13 +109,17 @@ public class GameController : NetworkBehaviour
         CreatureBuilder builder = new CharacterBuilder();
         CreatureDirector.Instance.Builder = builder;
         var cIndex = NetworkListener.Lobby[clientId];
-        /*RoomController.Instance.NetworkObject.Despawn();
-        Destroy(RoomController.Instance.gameObject);*/
         
         CreatureDirector.Instance.CharacterBuild(Enum.GetName(typeof(CharacterClass), cIndex));
 
         var rs = builder.Release();
         var playerTransform = (rs as NetworkBehaviour).transform;
+
+        //Find BossSpawn point
+        var playerSpawn = GameObject.FindGameObjectWithTag("PlayerSpawn");
+        var rigid = (rs as NetworkBehaviour).GetComponent<Rigidbody2D>();
+        //rigid.collisionDetectionMode = CollisionDetectionMode2D.Discrete; // should be, but it is default
+        rigid.MovePosition(playerSpawn.transform.localPosition);
 
         var control = InstantiateGameObject("Player/PlayerControl", null); //PLayer control (real owned by client)
 
@@ -128,6 +140,13 @@ public class GameController : NetworkBehaviour
             }
         };
         SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
+
+        playerCount++;
+
+        if (playerCount == NetworkListener.Lobby.Count)
+        {
+            GameLoadCompletedClientRpc();
+        }
     }
 
     public void Cast(List<SkillTag> skillTags, SkillPackageEventArg args)
@@ -361,6 +380,14 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void GameLoadCompletedClientRpc()
+    {
+        if (!IsClient) return;
+
+        GameObject.Find("Loading").SetActive(false);
+    }
+
     public List<SkillName> GetCreatureSkill(string name) => skillDict.ContainsKey(name) ? skillDict[name] : null;
 
     public GameObject InstantiateGameObject(string path, Transform parent)
@@ -403,7 +430,7 @@ public class GameController : NetworkBehaviour
             //Debug.Log(netObj.name);
 
             CreatureSetup(creatureObj, tag);
-
+            Debug.Log(netObj.name + " " + netObj.transform.localPosition);
             CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, creatureObj.NetworkObject);
         }
     }
@@ -427,5 +454,26 @@ public class GameController : NetworkBehaviour
     public void SpawnWithOwnerShip()
     {
 
+    }
+
+    public void ToRoomScene()
+    {
+        if (IsServer)
+        {
+            GameObject.FindGameObjectsWithTag("Character").ToList().ForEach(c => { c.GetComponent<NetworkObject>().Despawn(); Destroy(c); });
+            GameObject.FindGameObjectsWithTag("Player").ToList().ForEach(c => { c.GetComponent<NetworkObject>().RemoveOwnership(); c.GetComponent<NetworkObject>().Despawn(); Destroy(c); });
+            NetworkManager.Singleton.SceneManager.LoadScene("Room", LoadSceneMode.Single);
+        }
+        else //Client, not include host
+        {
+            Instance = null;
+            NetworkManager.Singleton.Shutdown();
+
+            if (NetworkManager.Singleton != null)
+            {
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+            SceneManager.LoadScene("GameMenu");
+        }
     }
 }

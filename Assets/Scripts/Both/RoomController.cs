@@ -3,9 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
+using System.Net;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+using Unity.Netcode.Transports.UTP;
 
 public class RoomController : NetworkBehaviour
 {
@@ -14,7 +18,9 @@ public class RoomController : NetworkBehaviour
     // Lobby[LocalClientId][CharacterIndex]
     private Dictionary<ulong, int> lobby = new Dictionary<ulong, int>();
     public Scene Room;
+    public bool isSecond;
 
+    [SerializeField] private GameObject loading;
     [SerializeField] private RoomButton script;
 
     private void Awake()
@@ -32,11 +38,14 @@ public class RoomController : NetworkBehaviour
 
     public void SetupRoom()
     {
+        loading = GameObject.FindGameObjectWithTag("Loading");
+        loading.transform.GetChild(0).gameObject.SetActive(false);
         script = GameObject.Find("Canvas").GetComponent<RoomButton>();
+        //script.IpAddrTxt.text = GetLocalIPAddress() ?? "0.0.0.0";
 
         if (!IsServer) return;
 
-        lobby = new Dictionary<ulong, int>();
+        if (lobby is null) lobby = new Dictionary<ulong, int>();
 
         script.StartGameBtn.gameObject.SetActive(true);
 
@@ -46,7 +55,7 @@ public class RoomController : NetworkBehaviour
         }
     }
 
-    #region aaa
+    #region Setup new player connection
     [ServerRpc(RequireOwnership = false)]
     public void ChangedCharacterIndexServerRpc(int index, ServerRpcParams serverRpcParams = default)
     {
@@ -141,6 +150,22 @@ public class RoomController : NetworkBehaviour
                 TargetClientIds = new ulong[] { clientId }
             }
         };
+
+        if (isSecond && lobby.ContainsKey(clientId))
+        {
+            if (clientId == NetworkManager.ServerClientId) return;
+
+            GameLoadDeactiveClientRpc(clientRpcParams);
+
+            int i = 0;
+            foreach (var item in lobby)
+            {
+                DrawPlayerGridClientRpc(i, item.Value, item.Key == clientId, clientRpcParams);
+                i++;
+            }
+            return;
+        }
+
         //Setup before players to sender (maybe NetworkVariable)
         for (int i = 0; i < lobby.Count; i++)
         {
@@ -178,6 +203,7 @@ public class RoomController : NetworkBehaviour
 
     public Dictionary<ulong, int> GetLobby() => lobby;
 
+    #region Out room
     public void OutRoom()
     {
         Debug.Log("Out " + IsServer + " " + IsClient);
@@ -324,13 +350,62 @@ public class RoomController : NetworkBehaviour
         }
         SceneManager.LoadScene("GameMenu");
     }
+    #endregion
+
+    #region Reroom
+    public void DrawPlayerGrid()
+    {
+        int i = 0;
+        foreach (var item in lobby)
+        {
+            SetupPlayer(i, item.Key == NetworkManager.Singleton.LocalClientId);
+
+            script.Players[i].CharacterIndex = item.Value;
+            script.Players[i].UpdateCharacter();
+            i++;
+        }
+    }
+
+    [ClientRpc]
+    public void DrawPlayerGridClientRpc(int index, int cIndex, bool activeButton, ClientRpcParams clientRpcParams = default)
+    {
+        SetupPlayer(index, activeButton);
+
+        script.Players[index].CharacterIndex = cIndex;
+        script.Players[index].UpdateCharacter();
+    }
+
+    [ClientRpc]
+    private void GameLoadDeactiveClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (IsServer) return;
+
+        SetupRoom();
+    }
+    #endregion
+
+    [ClientRpc]
+    private void GameLoadClientRpc()
+    {
+        if (IsServer) return;
+
+        loading.transform.GetChild(0).gameObject.SetActive(true);
+    }
 
     public void StartGame()
     {
         if (!IsServer) return;
 
+        loading.transform.GetChild(0).gameObject.SetActive(true);
+        GameLoadClientRpc();
         NetworkListener.Lobby = lobby;
         NetworkManager.Singleton.SceneManager.LoadScene("PlayGame", LoadSceneMode.Single);
+    }
+
+    public void SetLobby(Dictionary<ulong, int> lobby)
+    {
+        isSecond = true;
+        this.lobby = lobby;
     }
 
     IEnumerator WaitToDisconnectServer()
@@ -340,6 +415,8 @@ public class RoomController : NetworkBehaviour
             yield return null;
         }
         Debug.Log("WaitToDisconnectServer");
+        NetworkListener.Lobby = null;
+        Instance = null;
         NetworkManager.Singleton.Shutdown();
 
         if (NetworkManager.Singleton != null)
@@ -348,6 +425,30 @@ public class RoomController : NetworkBehaviour
         }
         SceneManager.LoadScene("GameMenu");
     }
+
+    /*private string GetLocalIPAddress()
+    {
+        if (IsServer) 
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+        else if (IsClient)
+        {
+            Debug.Log("Get IP Client");
+
+            return NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address;
+        }
+
+        return null;
+    }*/
 
     public override void OnDestroy()
     {

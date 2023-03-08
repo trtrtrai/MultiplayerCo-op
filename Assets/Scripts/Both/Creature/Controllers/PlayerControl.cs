@@ -150,5 +150,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
             SpAttackTrigger2.Value = false;
         }
         #endregion
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            //OnDisable + 2 line under :v
+            script.actions["Movement"].performed -= Movement;
+            script.actions["Movement"].canceled -= Movement;
+        }
     }
 }

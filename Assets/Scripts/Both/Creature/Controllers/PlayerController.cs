@@ -179,6 +179,16 @@ namespace Assets.Scripts.Both.Creature.Controllers
             }
         }
         #endregion
+
+        public override void OnDestroy()
+        {
+            if (!IsServer) return;
+
+            base.OnDestroy();
+            control.AttackTrigger.OnValueChanged -= AttackTrigger_OnValueChange;
+            control.SpAttackTrigger.OnValueChanged -= SpAttackTrigger_OnValueChange;
+            control.SpAttackTrigger2.OnValueChanged -= SpAttackTrigger2_OnValueChange;
+        }
     }
 
     public interface ICreatureController

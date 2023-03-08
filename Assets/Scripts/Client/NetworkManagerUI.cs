@@ -1,7 +1,7 @@
 using Assets.Scripts.Both;
-using System;
-using Unity.Collections;
+using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,6 +13,9 @@ namespace Assets.Scripts.Client
         [SerializeField] private Button btnServer;
         [SerializeField] private Button btnHost;
         [SerializeField] private Button btnClient;
+        [SerializeField] private TMP_InputField ipAddrInput;
+
+        [SerializeField] UnityTransport transport;
 
         private void Awake()
         {
@@ -37,8 +40,20 @@ namespace Assets.Scripts.Client
             btnClient.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyClient();
+                /*if (SetIpAddress())
+                {
+                    NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyClient();
+                }*/
             });
         }
+
+        /*private bool SetIpAddress()
+        {
+            transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.ConnectionData.Address = ipAddrInput.text;
+
+            return true;
+        }*/
 
         private void OnDestroy()
         {
