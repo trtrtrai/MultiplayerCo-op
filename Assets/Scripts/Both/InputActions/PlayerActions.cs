@@ -123,12 +123,78 @@ namespace Assets.Scripts.Both.InputActions
                     ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": ""LeftStick"",
+                    ""id"": ""865bc784-b204-40b9-8271-600bc68a1023"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""c26e9a0d-1fde-4680-ba0f-2412f4e22cfd"",
+                    ""path"": ""<XInputController>/leftStick/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""c0e526b5-b13f-4581-bd18-5a7db7562986"",
+                    ""path"": ""<XInputController>/leftStick/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""48919604-4e82-4e38-8f03-02d7b11b7ad9"",
+                    ""path"": ""<XInputController>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""255d0376-5de5-4202-a1cf-0e9b4bbaac2a"",
+                    ""path"": ""<XInputController>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
                     ""name"": """",
                     ""id"": ""88bd5045-5f87-416f-b49d-02cff7718bc0"",
                     ""path"": ""<Keyboard>/j"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5dd20e19-893f-4099-a1eb-6987dc3d5f9b"",
+                    ""path"": ""<XInputController>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
                     ""action"": ""Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -146,11 +212,33 @@ namespace Assets.Scripts.Both.InputActions
                 },
                 {
                     ""name"": """",
+                    ""id"": ""2a15adf8-b0f0-48a1-bdf7-4e174aa1f056"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""SpecialAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""737d5255-7147-4eec-938d-083b735e2bbf"",
                     ""path"": ""<Keyboard>/l"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
+                    ""action"": ""SpecialAttack2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3847333b-cb6b-458b-8f6f-a09fb00d5821"",
+                    ""path"": ""<XInputController>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
                     ""action"": ""SpecialAttack2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -171,6 +259,17 @@ namespace Assets.Scripts.Both.InputActions
                 {
                     ""devicePath"": ""<Mouse>"",
                     ""isOptional"": true,
+                    ""isOR"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Xbox Controller"",
+            ""bindingGroup"": ""Xbox Controller"",
+            ""devices"": [
+                {
+                    ""devicePath"": ""<XInputController>"",
+                    ""isOptional"": false,
                     ""isOR"": false
                 }
             ]
@@ -302,6 +401,15 @@ namespace Assets.Scripts.Both.InputActions
             {
                 if (m_KeyboardSchemeIndex == -1) m_KeyboardSchemeIndex = asset.FindControlSchemeIndex("Keyboard");
                 return asset.controlSchemes[m_KeyboardSchemeIndex];
+            }
+        }
+        private int m_XboxControllerSchemeIndex = -1;
+        public InputControlScheme XboxControllerScheme
+        {
+            get
+            {
+                if (m_XboxControllerSchemeIndex == -1) m_XboxControllerSchemeIndex = asset.FindControlSchemeIndex("Xbox Controller");
+                return asset.controlSchemes[m_XboxControllerSchemeIndex];
             }
         }
         public interface IGroundActions

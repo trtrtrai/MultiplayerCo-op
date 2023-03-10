@@ -90,8 +90,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VectorAxis:
     m_InternalValue: {x: 0, y: 0}
-  VectorState:
-    m_InternalValue: {x: 1, y: 1}
   AttackTrigger:
     m_InternalValue: 0
   SpAttackTrigger:

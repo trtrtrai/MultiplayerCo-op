@@ -15,7 +15,7 @@ MonoBehaviour:
   CreatureName: Treant
   Status:
   - Type: 0
-    Amount: 1000
+    Amount: 2000
   - Type: 1
     Amount: 50
   - Type: 2

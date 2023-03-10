@@ -92,7 +92,11 @@ namespace Assets.Scripts.Server.Contruction
 
                 (arg1 as Both.Creature.Creature).NetworkObject.Despawn();
 
-                if (creatures.Contains(creature)) creatures.Remove(creature);
+                if (creatures.Contains(creature))
+                {
+                    creatures.Remove(creature);
+                    GameController.Instance.IsCharacterDeath(creature);
+                }
                 Destroy(creature.gameObject);
             }
         }

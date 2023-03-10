@@ -20,6 +20,8 @@ using Assets.Scripts.Server.Creature;
 using Assets.Scripts.Client;
 using Assets.Scripts.Both;
 using UnityEngine.SceneManagement;
+using Assets.Scripts.Both.UIHolder;
+using System.Collections;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -29,7 +31,8 @@ public class GameController : NetworkBehaviour
     public static GameController Instance { get; private set; }
 
     private Dictionary<string, List<SkillName>> skillDict;
-    private int playerCount = 0;
+    private List<ICreature> characters;
+    public NetworkVariable<float> Timer = new NetworkVariable<float>(0);
 
     private void Awake()
     {
@@ -99,6 +102,8 @@ public class GameController : NetworkBehaviour
         rigid.MovePosition(bossSpawn.transform.localPosition);
 
         SpawnCreature(rs as Creature, "Boss", true);
+
+        (rs.GetStats(StatsType.Health) as Health).OnDeadEvent += OnBossDeath;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -141,9 +146,17 @@ public class GameController : NetworkBehaviour
         };
         SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
 
-        playerCount++;
+        try
+        {
+            characters.Add(rs);
+        }
+        catch
+        {
+            characters = new List<ICreature>();
+            characters.Add(rs);
+        }
 
-        if (playerCount == NetworkListener.Lobby.Count)
+        if (characters.Count == NetworkListener.Lobby.Count)
         {
             GameLoadCompletedClientRpc();
         }
@@ -388,6 +401,72 @@ public class GameController : NetworkBehaviour
         GameObject.Find("Loading").SetActive(false);
     }
 
+    private void OnBossDeath()
+    {
+        if (!IsServer) return;
+
+        Time.timeScale = 0f;
+        Timer.Value = 5f;
+        StartCoroutine(WaitToReroom());
+
+        ShowResultClientRpc(true);
+    }
+
+    public void IsCharacterDeath(ICreature creature)
+    {
+        if (!IsServer) return;
+
+        if (characters.Contains(creature))
+        {
+            characters.Remove(creature);
+
+            if (characters.Count == 0)
+            {
+                Time.timeScale = 0f;
+                Timer.Value = 5f;
+                StartCoroutine(WaitToReroom());
+
+                ShowResultClientRpc(false);
+            }
+        }
+    }
+
+    IEnumerator WaitToReroom()
+    {
+        while (Timer.Value > 0)
+        {
+            Timer.Value -= Time.fixedUnscaledDeltaTime / 2; // (1/50) / 2: two frame per 0.1s
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
+        ToRoomScene();
+    }
+
+    [ClientRpc]
+    private void ShowResultClientRpc(bool isWin, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+
+        //Stop something on Client: control,...
+
+        var script = GameObject.Find("Canvas").GetComponentInChildren<ResultPanelHolder>();
+
+        if (isWin)
+        {
+            script.Label.text = "congratulation";
+            script.Content.text = "The Boss is destroyed, Hero team win.";
+        }
+        else
+        {
+            script.Label.text = "mission failed";
+            script.Content.text = "All Heroes are destroyed, The Boss win.";
+        }
+
+        script.StartTiming();
+        script.Container.SetActive(true);
+    }
+
     public List<SkillName> GetCreatureSkill(string name) => skillDict.ContainsKey(name) ? skillDict[name] : null;
 
     public GameObject InstantiateGameObject(string path, Transform parent)
@@ -430,7 +509,7 @@ public class GameController : NetworkBehaviour
             //Debug.Log(netObj.name);
 
             CreatureSetup(creatureObj, tag);
-            Debug.Log(netObj.name + " " + netObj.transform.localPosition);
+            //Debug.Log(netObj.name + " " + netObj.transform.localPosition);
             CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, creatureObj.NetworkObject);
         }
     }

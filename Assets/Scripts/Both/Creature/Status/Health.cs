@@ -21,11 +21,10 @@ namespace Assets.Scripts.Both.Creature.Status
             if (e.NewValue == 0)
             {
                 isDead = true;
+                OnDeadEvent?.Invoke();
             }
-
-            OnDeadEvent?.Invoke(isDead);
         }
 
-        public event Action<bool> OnDeadEvent;
+        public event Action OnDeadEvent;
     }
 }
