@@ -126,6 +126,18 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
             return objs.ElementAt(distance.IndexOf(distance.Min()));
         }
 
+        protected bool GetOwner()
+        {
+            if (IsOwner)
+            {
+                owner = gameObject.transform.parent.GetComponent<ICreatureController>();
+                if (owner is null) return false;
+                else return true;
+            }
+
+            return false;
+        }
+
         public virtual void SkillTagExecuteCollider2d(GameObject obj)
         {
             

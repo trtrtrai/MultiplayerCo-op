@@ -41,7 +41,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7592750964806049775}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
@@ -71,6 +71,14 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9541bada-4953-43ad-8d65-bb7affb2b753
     m_ActionName: Ground/SpecialAttack[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 8757a9b0-26b2-4596-80ba-a28b9af51ac4
+    m_ActionName: Ground/SpecialAttack2[/Keyboard/l]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 48fe58e5-6059-46bc-bfd9-da84181920ef
+    m_ActionName: Ground/A[/Keyboard/escape]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Ground

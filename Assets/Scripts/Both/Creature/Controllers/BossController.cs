@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Creature.Attackable;
+using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
 using Pathfinding;
 using System.Collections;
@@ -15,6 +16,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private Animator animator;
         [SerializeField] private Rigidbody2D rigid;
         [SerializeField] private Transform target;
+        [SerializeField] private NetworkStats stats;
         [SerializeField] private int speed;
         [SerializeField] private float nextWayPointDistance = .5f;
         Path path;
@@ -35,12 +37,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Awake()
         {
-            if (NetworkManager.Singleton.LocalClientId != 0) return;
-
             animator = GetComponent<Animator>();
             creature = GetComponent<Creature>();
 
             rigid = GetComponent<Rigidbody2D>();
+            stats = GetComponentInChildren<NetworkStats>();
+
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
             seeker = GetComponent<Seeker>();
         }
 
@@ -57,7 +60,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
         // Start is called before the first frame update
         void Start()
         {
+            stats.TriggerRotation.OnValueChanged += OnRotationTriggered;
+
             if (NetworkManager.Singleton.LocalClientId != 0) return;
+
+            stats.VectorState.Value = Vector2.one;
+            stats.VectorScale.Value = transform.localScale;
 
             target = FindCharacter();
 
@@ -110,6 +118,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
         // Update is called once per frame
         void FixedUpdate()
         {
+            if (!IsHost && IsClient)
+            {
+                rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value; //only Client
+            }
+
+            transform.localScale = stats.VectorScale.Value; //Client + server
+
             if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
 
             if (!target)
@@ -275,12 +290,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 if (lookAtRad != 4)
                 {
                     flipped.z *= -1f;
-                    transform.localScale = flipped;
+                    stats.VectorScale.Value = flipped;
                 }
 
                 if (lookAtRad != 2)
                 {
-                    transform.Rotate(0f, 180f, 0f);
+                    stats.TriggerRotation.Value = true;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 1;
@@ -292,12 +307,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 if (lookAtRad != 3)
                 {
                     flipped.z *= -1f;
-                    transform.localScale = flipped;
+                    stats.VectorScale.Value = flipped;
                 }
 
                 if (lookAtRad != 1)
                 {
-                    transform.Rotate(0f, 180f, 0f);
+                    stats.TriggerRotation.Value = true;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 2;
@@ -309,12 +324,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 if (lookAtRad != 2)
                 {
                     flipped.z *= -1f;
-                    transform.localScale = flipped;
+                    stats.VectorScale.Value = flipped;
                 }
 
                 if (lookAtRad != 4)
                 {
-                    transform.Rotate(0f, 180f, 0f);
+                    stats.TriggerRotation.Value = true;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 3;
@@ -326,15 +341,25 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 if (lookAtRad != 1)
                 {
                     flipped.z *= -1f;
-                    transform.localScale = flipped;
+                    stats.VectorScale.Value = flipped;
                 }
 
                 if (lookAtRad != 3)
                 {
-                    transform.Rotate(0f, 180f, 0f);
+                    stats.TriggerRotation.Value = true;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 4;
+            }
+        }
+
+        private void OnRotationTriggered(bool oldV, bool newV)
+        {
+            if (newV)
+            {
+                transform.Rotate(0f, 180f, 0f);
+
+                if (NetworkManager.Singleton.LocalClientId == 0) stats.TriggerRotation.Value = false;
             }
         }
         #endregion
@@ -362,9 +387,9 @@ namespace Assets.Scripts.Both.Creature.Controllers
             }
 
             var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
-            var vectorSpeed = direction * speed * Time.fixedDeltaTime;
-            rigid.velocity = new Vector2(vectorSpeed.x, vectorSpeed.y);
-            animator.SetFloat("speed", Mathf.Abs(vectorSpeed.x) + Mathf.Abs(vectorSpeed.y));
+            stats.VectorSpeed.Value = direction * speed * Time.fixedDeltaTime;
+            rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
+            animator.SetFloat("speed", Mathf.Abs(stats.VectorSpeed.Value.x) + Mathf.Abs(stats.VectorSpeed.Value.y));
 
             float distance = Vector2.Distance(rigid.position, path.vectorPath[currentWayPoint]);
 
@@ -394,6 +419,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         public override void OnDestroy()
         {
             base.OnDestroy();
+            stats.TriggerRotation.OnValueChanged -= OnRotationTriggered;
             StopAllCoroutines();
         }
     }

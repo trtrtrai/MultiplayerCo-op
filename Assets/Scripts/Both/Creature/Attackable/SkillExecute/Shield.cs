@@ -24,6 +24,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         protected override void SpecializedBehaviour()
         {
+            if (owner is null && !GetOwner()) return;
             owner.IsUpdateAnimation = false;
             owner.Root();
 
@@ -39,10 +40,13 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         {
             yield return new WaitForSeconds(skillTags[0].Duration);
 
-            owner.IsUpdateAnimation = true;
-            owner.Animator.SetBool("isShield", false);
-            owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
-            owner.MoveNonAffect();
+            if (owner != null || GetOwner())
+            {
+                owner.IsUpdateAnimation = true;
+                owner.Animator.SetBool("isShield", false);
+                owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
+                owner.MoveNonAffect();
+            }         
         }
 
         public override void SkillTagExecuteTrigger2d(GameObject obj)

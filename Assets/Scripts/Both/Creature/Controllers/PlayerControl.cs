@@ -1,3 +1,4 @@
+using Assets.Scripts.Both.InputActions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -17,14 +18,16 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         [SerializeField] private PlayerInput script;
 
-        public void StartListen()
+        public override void OnNetworkSpawn()
         {
-            //Debug.Log(OwnerClientId + " can write: " + AttackTrigger.CanClientWrite(OwnerClientId));
+            base.OnNetworkSpawn();
+
             if (!IsOwner)
             {
                 return;
             }
 
+            script.enabled = true;
             ListenMovement();
             ListenAttack();
             ListenSpAttack();
@@ -37,7 +40,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             {
                 return;
             }
-
+            Debug.Log("Listen start enable");
             ListenMovement();
             ListenAttack();
             ListenSpAttack();
@@ -48,6 +51,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             if (!IsOwner) return;
 
+            Debug.Log("Listen start disable");
             UnlistenMovement();
             UnlistenAttack();
             UnlistenSpAttack();
@@ -57,6 +61,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         #region Input listener setup
         private void ListenMovement()
         {
+            Debug.Log("Listen movement");
             script.actions["Movement"].started += Movement;
             script.actions["Movement"].performed += Movement;
             script.actions["Movement"].canceled += Movement;
@@ -64,6 +69,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void UnlistenMovement()
         {
+            Debug.Log("unlis");
             script.actions["Movement"].started -= Movement;
         }
 

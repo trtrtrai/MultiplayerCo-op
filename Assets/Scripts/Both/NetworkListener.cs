@@ -110,6 +110,7 @@ namespace Assets.Scripts.Both
                                     roomCtroller.GetComponent<RoomController>().NetworkObject.Spawn(true);
                                     //Debug.Log(roomCtroller.GetComponent<NetworkObject>().IsSpawned);
                                     RoomController.Instance.SetupRoom();
+                                    NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
                                     if (Lobby != null)
                                     {
                                         RoomController.Instance.SetLobby(Lobby);
@@ -220,6 +221,14 @@ namespace Assets.Scripts.Both
                         }
                         break;
                     }
+            }
+        }
+
+        private void Singleton_OnClientDisconnectCallback(ulong clientId)
+        {
+            if (clientId != 0 && Lobby != null)
+            {
+                Lobby.Remove(clientId);
             }
         }
 

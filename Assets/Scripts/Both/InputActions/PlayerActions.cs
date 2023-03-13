@@ -64,6 +64,15 @@ namespace Assets.Scripts.Both.InputActions
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlayMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""48fe58e5-6059-46bc-bfd9-da84181920ef"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -242,6 +251,28 @@ namespace Assets.Scripts.Both.InputActions
                     ""action"": ""SpecialAttack2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""48e6ef62-61e9-4bda-8c32-cffe61f68280"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""PlayMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""10bf2f48-5cc3-4542-befe-781af2652518"",
+                    ""path"": ""<XInputController>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Xbox Controller"",
+                    ""action"": ""PlayMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -282,6 +313,7 @@ namespace Assets.Scripts.Both.InputActions
             m_Ground_Attack = m_Ground.FindAction("Attack", throwIfNotFound: true);
             m_Ground_SpecialAttack = m_Ground.FindAction("SpecialAttack", throwIfNotFound: true);
             m_Ground_SpecialAttack2 = m_Ground.FindAction("SpecialAttack2", throwIfNotFound: true);
+            m_Ground_PlayMenu = m_Ground.FindAction("PlayMenu", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -345,6 +377,7 @@ namespace Assets.Scripts.Both.InputActions
         private readonly InputAction m_Ground_Attack;
         private readonly InputAction m_Ground_SpecialAttack;
         private readonly InputAction m_Ground_SpecialAttack2;
+        private readonly InputAction m_Ground_PlayMenu;
         public struct GroundActions
         {
             private @PlayerActions m_Wrapper;
@@ -353,6 +386,7 @@ namespace Assets.Scripts.Both.InputActions
             public InputAction @Attack => m_Wrapper.m_Ground_Attack;
             public InputAction @SpecialAttack => m_Wrapper.m_Ground_SpecialAttack;
             public InputAction @SpecialAttack2 => m_Wrapper.m_Ground_SpecialAttack2;
+            public InputAction @PlayMenu => m_Wrapper.m_Ground_PlayMenu;
             public InputActionMap Get() { return m_Wrapper.m_Ground; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -374,6 +408,9 @@ namespace Assets.Scripts.Both.InputActions
                     @SpecialAttack2.started -= m_Wrapper.m_GroundActionsCallbackInterface.OnSpecialAttack2;
                     @SpecialAttack2.performed -= m_Wrapper.m_GroundActionsCallbackInterface.OnSpecialAttack2;
                     @SpecialAttack2.canceled -= m_Wrapper.m_GroundActionsCallbackInterface.OnSpecialAttack2;
+                    @PlayMenu.started -= m_Wrapper.m_GroundActionsCallbackInterface.OnPlayMenu;
+                    @PlayMenu.performed -= m_Wrapper.m_GroundActionsCallbackInterface.OnPlayMenu;
+                    @PlayMenu.canceled -= m_Wrapper.m_GroundActionsCallbackInterface.OnPlayMenu;
                 }
                 m_Wrapper.m_GroundActionsCallbackInterface = instance;
                 if (instance != null)
@@ -390,6 +427,9 @@ namespace Assets.Scripts.Both.InputActions
                     @SpecialAttack2.started += instance.OnSpecialAttack2;
                     @SpecialAttack2.performed += instance.OnSpecialAttack2;
                     @SpecialAttack2.canceled += instance.OnSpecialAttack2;
+                    @PlayMenu.started += instance.OnPlayMenu;
+                    @PlayMenu.performed += instance.OnPlayMenu;
+                    @PlayMenu.canceled += instance.OnPlayMenu;
                 }
             }
         }
@@ -418,6 +458,7 @@ namespace Assets.Scripts.Both.InputActions
             void OnAttack(InputAction.CallbackContext context);
             void OnSpecialAttack(InputAction.CallbackContext context);
             void OnSpecialAttack2(InputAction.CallbackContext context);
+            void OnPlayMenu(InputAction.CallbackContext context);
         }
     }
 }

@@ -364,12 +364,6 @@ public class GameController : NetworkBehaviour
             cmrFolow.Target = playerObj.transform;
             cmrFolow.StartFocus();
 
-            //Add control into controller - client
-            var control = GameObject.FindGameObjectsWithTag("Player").FirstOrDefault(c => c.GetComponent<NetworkObject>().IsOwner);
-            if (control is null) return;
-            var scriptCtrl = control.GetComponent<PlayerControl>();
-            scriptCtrl.StartListen();
-
             FindObjectsOfType(typeof(Creature)).ToList().ForEach(c => {
                 if (c is null) return;
 
@@ -387,7 +381,7 @@ public class GameController : NetworkBehaviour
             
             for (int i = 0; i < skillUI.Length; i++)
             {
-                //Debug.Log(skillUI[i].name);
+                //Debug.Log(skiccllUI[i].name);
                 (skillUI[i] as SkillUI).Setup(skills[int.Parse(skillUI[i].name)]);
             }
         }
@@ -449,6 +443,7 @@ public class GameController : NetworkBehaviour
         if (!IsClient) return;
 
         //Stop something on Client: control,...
+        GameObject.Find("Canvas").GetComponent<GameButton>().ResetPlayerInput();
 
         var script = GameObject.Find("Canvas").GetComponentInChildren<ResultPanelHolder>();
 
@@ -507,8 +502,8 @@ public class GameController : NetworkBehaviour
         {
             (netObj as NetworkObject).Spawn(destroyWithScene);
             //Debug.Log(netObj.name);
-
             CreatureSetup(creatureObj, tag);
+
             //Debug.Log(netObj.name + " " + netObj.transform.localPosition);
             CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, creatureObj.NetworkObject);
         }

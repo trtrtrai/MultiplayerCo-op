@@ -22,23 +22,27 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         protected override void SpecializedBehaviour()
         {
+            if (owner is null && !GetOwner()) return;
             owner.IsUpdateAnimation = false;
 
             //base.SpecializedBehaviour();
 
-            StartCoroutine(SlashDuration());
+            StartCoroutine(SwordDuration());
             var orien = owner.Animator.GetInteger("orientation");
             owner.Animator.SetInteger("orientation", orien < 0 ? orien : -orien);
             owner.Animator.SetBool("isAttack", true);
         }
 
-        private IEnumerator SlashDuration() //Delay animation
+        private IEnumerator SwordDuration() //Delay animation
         {
             yield return new WaitForSeconds(skillTags[0].Duration);
 
-            owner.IsUpdateAnimation = true;
-            owner.Animator.SetBool("isAttack", false);
-            owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
+            if (owner != null || GetOwner())
+            {
+                owner.IsUpdateAnimation = true;
+                owner.Animator.SetBool("isAttack", false);
+                owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
+            }               
         }
 
         public override void SkillTagExecuteCollider2d(GameObject obj)

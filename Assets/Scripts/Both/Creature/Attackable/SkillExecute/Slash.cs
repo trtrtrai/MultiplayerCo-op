@@ -23,6 +23,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         protected override void SpecializedBehaviour()
         {
+            if (owner is null && !GetOwner()) return;
             owner.IsUpdateAnimation = false;
 
             //base.SpecializedBehaviour();
@@ -37,9 +38,12 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
         {
             yield return new WaitForSeconds(skillTags[0].Duration);
 
-            owner.IsUpdateAnimation = true;
-            owner.Animator.SetBool("isAttack", false);
-            owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
+            if (owner != null || GetOwner())
+            {
+                owner.IsUpdateAnimation = true;
+                owner.Animator.SetBool("isAttack", false);
+                owner.Animator.SetInteger("orientation", Mathf.Abs(owner.Animator.GetInteger("orientation")));
+            }
         }
 
         public override void SkillTagExecuteCollider2d(GameObject obj)

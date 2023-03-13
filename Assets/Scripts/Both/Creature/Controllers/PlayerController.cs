@@ -1,3 +1,4 @@
+using Assets.Scripts.Both.Creature.Status;
 using System;
 using System.Collections;
 using Unity.Netcode;
@@ -14,9 +15,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private Animator animator;
         [SerializeField] private Rigidbody2D player;
         [SerializeField] private PlayerControl control;
-        [SerializeField] private Vector2 VectorSpeed;
-        [SerializeField] private Vector2 VectorState;
         [SerializeField] private float speed;
+        [SerializeField] private NetworkStats stats;
 
         public bool IsUpdateAnimation { get; set; }
         public Animator Animator => animator;
@@ -26,6 +26,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             animator = GetComponent<Animator>();
             player = GetComponent<Rigidbody2D>();
             creature = GetComponent<Creature>();
+            stats = GetComponentInChildren<NetworkStats>();
 
             var spdStats = creature.GetStats(Scriptable.StatsType.Speed);
             speed = spdStats.GetValue();
@@ -41,20 +42,25 @@ namespace Assets.Scripts.Both.Creature.Controllers
         void Start()
         {
             //init animation
-            VectorState = Vector2.one;
+            MoveNonAffect();
             IsUpdateAnimation = true;
             animator.SetInteger("orientation", 2);
         }
 
         private void FixedUpdate()
         {
-            //if (!IsServer && !IsHost) return;
+            if (!IsHost && IsClient)
+            {
+                player.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
+            }
+
             if (control is null) return;
-            if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
+
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             //Movement
-            VectorSpeed = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
-            player.velocity = VectorSpeed * VectorState;
+            stats.VectorSpeed.Value = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
+            player.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
 
             if (!IsUpdateAnimation) return;
 
@@ -65,13 +71,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
         public void MoveNonAffect()
         {
             if (NetworkManager.LocalClientId == 0)
-                VectorState = Vector2.one; //only server can change value
+                stats.VectorState.Value = Vector2.one; //only server can change value
         }
 
         public void Root()
         {
             if (NetworkManager.LocalClientId == 0)
-                VectorState = Vector2.zero; //only server can change value
+                stats.VectorState.Value = Vector2.zero; //only server can change value
         }
         #endregion
 
@@ -132,12 +138,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
         private void UpdateAnimation()
         {
             //handle movement animation (depend on animator architect)
-            animator.SetFloat("speed", Mathf.Abs(VectorSpeed.x) + Mathf.Abs(VectorSpeed.y));
+            animator.SetFloat("speed", Mathf.Abs(stats.VectorSpeed.Value.x) + Mathf.Abs(stats.VectorSpeed.Value.y));
 
-            if (VectorSpeed.x < 0) animator.SetInteger("orientation", 3);//left animate
-            else if (VectorSpeed.x > 0) animator.SetInteger("orientation", 4); //right animate
-            if (VectorSpeed.y > 0) animator.SetInteger("orientation", 1); //up animate
-            else if (VectorSpeed.y < 0) animator.SetInteger("orientation", 2); //down animate
+            if (stats.VectorSpeed.Value.x < 0) animator.SetInteger("orientation", 3);//left animate
+            else if (stats.VectorSpeed.Value.x > 0) animator.SetInteger("orientation", 4); //right animate
+            if (stats.VectorSpeed.Value.y > 0) animator.SetInteger("orientation", 1); //up animate
+            else if (stats.VectorSpeed.Value.y < 0) animator.SetInteger("orientation", 2); //down animate
         }
 
         #region Add PlayerControl
