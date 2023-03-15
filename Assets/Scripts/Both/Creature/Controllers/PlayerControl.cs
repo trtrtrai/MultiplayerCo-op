@@ -40,7 +40,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             {
                 return;
             }
-            Debug.Log("Listen start enable");
+            //Debug.Log("Listen start enable");
             ListenMovement();
             ListenAttack();
             ListenSpAttack();
@@ -51,7 +51,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             if (!IsOwner) return;
 
-            Debug.Log("Listen start disable");
+            //Debug.Log("Listen start disable");
             UnlistenMovement();
             UnlistenAttack();
             UnlistenSpAttack();
@@ -61,7 +61,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         #region Input listener setup
         private void ListenMovement()
         {
-            Debug.Log("Listen movement");
+            //Debug.Log("Listen movement");
             script.actions["Movement"].started += Movement;
             script.actions["Movement"].performed += Movement;
             script.actions["Movement"].canceled += Movement;
@@ -69,7 +69,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void UnlistenMovement()
         {
-            Debug.Log("unlis");
+            //Debug.Log("unlis");
             script.actions["Movement"].started -= Movement;
         }
 

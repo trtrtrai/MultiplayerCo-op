@@ -18,10 +18,9 @@ namespace Assets.Scripts.Both.Creature.Status
         public NetworkVariable<int> MaxCriticalHit = new NetworkVariable<int>();
         private HealthColorManage healthSlider;
 
-        public NetworkVariable<Vector2> VectorSpeed = new NetworkVariable<Vector2>(Vector2.zero);
         public NetworkVariable<Vector2> VectorState = new NetworkVariable<Vector2>(Vector2.zero);
         public NetworkVariable<bool> TriggerRotation = new NetworkVariable<bool>(false);
-        public NetworkVariable<Vector3> VectorScale = new NetworkVariable<Vector3>(Vector3.one);
+        public NetworkVariable<bool> TriggerScale = new NetworkVariable<bool>(false);
 
         public bool IsSetup = false;
 

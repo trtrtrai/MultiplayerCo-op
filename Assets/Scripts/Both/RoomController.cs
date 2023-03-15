@@ -175,7 +175,7 @@ public class RoomController : NetworkBehaviour
         lobby.Add(clientId, 0);
 
         if (lobby.Count > 4) return;
-        Debug.Log(lobby.Count);
+        //Debug.Log(lobby.Count);
 
         SetupPlayerClientRpc(clientId, lobby.Count - 1);
     }
@@ -206,7 +206,7 @@ public class RoomController : NetworkBehaviour
     #region Out room
     public void OutRoom()
     {
-        Debug.Log("Out " + IsServer + " " + IsClient);
+        //Debug.Log("Out " + IsServer + " " + IsClient);
         if (IsServer)
         {
             OutRoomAllClientRpc();

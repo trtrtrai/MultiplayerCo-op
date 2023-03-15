@@ -1,8 +1,11 @@
 using Assets.Scripts.Both.Creature.Status;
+using Assets.Scripts.Both.Scriptable;
 using System;
 using System.Collections;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Assets.Scripts.Both.Creature.Controllers
 {
@@ -26,45 +29,61 @@ namespace Assets.Scripts.Both.Creature.Controllers
             animator = GetComponent<Animator>();
             player = GetComponent<Rigidbody2D>();
             creature = GetComponent<Creature>();
-            stats = GetComponentInChildren<NetworkStats>();
-
-            var spdStats = creature.GetStats(Scriptable.StatsType.Speed);
-            speed = spdStats.GetValue();
-            spdStats.OnStatsChange += SpdStats_OnStatsChange;
+            stats = GetComponentInChildren<NetworkStats>();         
         }
 
-        private void SpdStats_OnStatsChange(object sender, Status.StatsChangeEventArgs e)
+        private void Speed_StatsChange(object sender, StatsChangeEventArgs e)
         {
-            speed = e.NewValue;
+            if (e.Type.Name.Equals(StatsType.Speed.ToString())) speed = e.NewValue;
+        }
+
+        private void Speed_ValueChange(int oldV, int newV)
+        {
+            speed = newV;
         }
 
         // Start is called before the first frame update
         void Start()
         {
-            //init animation
+            // get and listen speed
+            if (NetworkManager.Singleton.LocalClientId != 0)
+            {
+                GameController.Instance.RequestPlayerControlIdServerRpc(NetworkObject); //find player control on client
+
+                speed = stats.Speed.Value;
+                stats.Speed.OnValueChanged += Speed_ValueChange;
+            }
+            else
+            {
+                speed = creature.GetStats(StatsType.Speed).GetValue();
+                (creature as Creature).StatsChange += Speed_StatsChange;
+            }
             MoveNonAffect();
+
+            //init animation
             IsUpdateAnimation = true;
             animator.SetInteger("orientation", 2);
         }
 
         private void FixedUpdate()
         {
-            if (!IsHost && IsClient)
-            {
-                player.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
-            }
-
             if (control is null) return;
 
-            if (NetworkManager.Singleton.LocalClientId != 0) return;
+            if (NetworkManager.Singleton.LocalClientId != 0) //Client
+            {
+                var clientSpeed = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
+                player.velocity = clientSpeed * stats.VectorState.Value;
+            }
+            else //Server/Host
+            {
+                //Movement
+                var vectorSpeed = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
+                player.velocity = vectorSpeed * stats.VectorState.Value;
 
-            //Movement
-            stats.VectorSpeed.Value = new Vector2(control.VectorAxis.Value.x * speed * Time.fixedDeltaTime, control.VectorAxis.Value.y * speed * Time.fixedDeltaTime);
-            player.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
+                if (!IsUpdateAnimation) return;
 
-            if (!IsUpdateAnimation) return;
-
-            UpdateAnimation();
+                UpdateAnimation(player.velocity);
+            }          
         }
 
         #region Config movement direct
@@ -135,15 +154,15 @@ namespace Assets.Scripts.Both.Creature.Controllers
         /// <summary>
         /// Control animation state
         /// </summary>
-        private void UpdateAnimation()
+        private void UpdateAnimation(Vector2 velocity)
         {
             //handle movement animation (depend on animator architect)
-            animator.SetFloat("speed", Mathf.Abs(stats.VectorSpeed.Value.x) + Mathf.Abs(stats.VectorSpeed.Value.y));
+            animator.SetFloat("speed", Mathf.Abs(velocity.x) + Mathf.Abs(velocity.y));
 
-            if (stats.VectorSpeed.Value.x < 0) animator.SetInteger("orientation", 3);//left animate
-            else if (stats.VectorSpeed.Value.x > 0) animator.SetInteger("orientation", 4); //right animate
-            if (stats.VectorSpeed.Value.y > 0) animator.SetInteger("orientation", 1); //up animate
-            else if (stats.VectorSpeed.Value.y < 0) animator.SetInteger("orientation", 2); //down animate
+            if (velocity.x < 0) animator.SetInteger("orientation", 3);//left animate
+            else if (velocity.x > 0) animator.SetInteger("orientation", 4); //right animate
+            if (velocity.y > 0) animator.SetInteger("orientation", 1); //up animate
+            else if (velocity.y < 0) animator.SetInteger("orientation", 2); //down animate
         }
 
         #region Add PlayerControl
@@ -186,11 +205,37 @@ namespace Assets.Scripts.Both.Creature.Controllers
         }
         #endregion
 
+        IEnumerator FindPlayerControl(ulong clientId)
+        {
+            while (control is null)
+            {
+                var pCs = GameObject.FindGameObjectsWithTag("Player");
+
+                pCs.ToList().ForEach((p) =>
+                {
+                if (p.GetComponent<NetworkObject>().OwnerClientId == clientId)
+                    {
+                        control = p.GetComponent<PlayerControl>();
+                    }
+                });
+
+                yield return null;
+            }
+        }
+
+        public void ResponsePlayerControlId(ulong clientId)
+        {
+            Debug.Log("ResponsePlayerControlId " + clientId + "-" + NetworkManager.Singleton.LocalClientId);
+
+            StartCoroutine(FindPlayerControl(clientId));
+        }
+
         public override void OnDestroy()
         {
             if (!IsServer) return;
 
             base.OnDestroy();
+            StopAllCoroutines();
             control.AttackTrigger.OnValueChanged -= AttackTrigger_OnValueChange;
             control.SpAttackTrigger.OnValueChanged -= SpAttackTrigger_OnValueChange;
             control.SpAttackTrigger2.OnValueChanged -= SpAttackTrigger2_OnValueChange;

@@ -16,7 +16,8 @@ namespace Assets.Scripts.Server.Creature.Attackable
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject is null || Owner is null) return;
-
+            //Debug.Log(collision.gameObject.name + " " + collision.collider.name);
+            if (!collision.gameObject.name.Equals(collision.collider.name)) return; //only accept collider in parent, not child
             var creature = collision.gameObject.GetComponent<ICreature>();
             if (creature is null) return;
             

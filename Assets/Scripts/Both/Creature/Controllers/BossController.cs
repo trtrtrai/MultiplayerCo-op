@@ -12,7 +12,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
     public class BossController : NetworkBehaviour, ICreatureController
     {
         private ICreature creature;
-        private int lookAtRad;
+        [SerializeField] private int lookAtRad;
         [SerializeField] private Animator animator;
         [SerializeField] private Rigidbody2D rigid;
         [SerializeField] private Transform target;
@@ -61,11 +61,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
         void Start()
         {
             stats.TriggerRotation.OnValueChanged += OnRotationTriggered;
+            stats.TriggerScale.OnValueChanged += OnScaleTriggered;
 
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
-            stats.VectorState.Value = Vector2.one;
-            stats.VectorScale.Value = transform.localScale;
+            //stats.VectorState.Value = Vector2.one;
+            //stats.TriggerScale.Value = transform.localScale.x < 0 ? true : false;
 
             target = FindCharacter();
 
@@ -120,12 +121,10 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             if (!IsHost && IsClient)
             {
-                rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value; //only Client
+                //rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value; //only Client
             }
 
-            transform.localScale = stats.VectorScale.Value; //Client + server
-
-            if (/*control.GetComponent<NetworkObject>().OwnerClientId != */NetworkManager.Singleton.LocalClientId != 0) return;
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             if (!target)
             {
@@ -273,13 +272,43 @@ namespace Assets.Scripts.Both.Creature.Controllers
         #region Animation
         private void UpdateAnimation()
         {
-            LookAtTarget();
+            if (lookAtRad == 0)
+            {
+                var distanceVector = target.localPosition - (transform.localPosition + new Vector3(0, 2.5f));
+                var distance = distanceVector.normalized;
+
+                if (distance.x > 0 && distance.y > 0) //top-right = boss's face is back-right (zFlipped = -1 and yRotate = 0)
+                {
+
+                    stats.TriggerScale.Value = false;
+                    stats.TriggerRotation.Value = false;
+                    lookAtRad = 1;
+                }
+                else if (distance.x > 0 && distance.y <= 0) //bottom-right = boss's face is front-right (zFlipped = 1 and yRotate = 0)
+                {
+                    stats.TriggerScale.Value = true;
+                    stats.TriggerRotation.Value = false;
+                    lookAtRad = 2;
+                }
+                else if (distance.x <= 0 && distance.y > 0) //top-left = boss's face is back-left (zFlipped = 1 and yRotate = 180)
+                {
+                    stats.TriggerScale.Value = true;
+                    stats.TriggerRotation.Value = true;
+                    lookAtRad = 3;
+                }
+                else if (distance.x <= 0 && distance.y <= 0) //bottom-left = boss's face is back-left (zFlipped = -1 and yRotate = 180)
+                {
+                    stats.TriggerScale.Value = false;
+                    stats.TriggerRotation.Value = true;
+                    lookAtRad = 4;
+                }
+            }
+            else LookAtTarget();
         }
 
         //Flipped and rotate boss follow target distance
         private void LookAtTarget()
         {
-            Vector3 flipped = transform.localScale;
             var distanceVector = target.localPosition - (transform.localPosition + new Vector3(0, 2.5f));
             var distance = distanceVector.normalized;
 
@@ -289,13 +318,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (lookAtRad != 4)
                 {
-                    flipped.z *= -1f;
-                    stats.VectorScale.Value = flipped;
+                    stats.TriggerScale.Value = false;
                 }
 
                 if (lookAtRad != 2)
                 {
-                    stats.TriggerRotation.Value = true;
+                    stats.TriggerRotation.Value = false;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 1;
@@ -306,13 +334,12 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (lookAtRad != 3)
                 {
-                    flipped.z *= -1f;
-                    stats.VectorScale.Value = flipped;
+                    stats.TriggerScale.Value = true;
                 }
 
                 if (lookAtRad != 1)
                 {
-                    stats.TriggerRotation.Value = true;
+                    stats.TriggerRotation.Value = false;
                 }
                 //Debug.Log(distance);
                 lookAtRad = 2;
@@ -323,8 +350,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (lookAtRad != 2)
                 {
-                    flipped.z *= -1f;
-                    stats.VectorScale.Value = flipped;
+                    stats.TriggerScale.Value = true;
                 }
 
                 if (lookAtRad != 4)
@@ -340,8 +366,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
                 if (lookAtRad != 1)
                 {
-                    flipped.z *= -1f;
-                    stats.VectorScale.Value = flipped;
+                    stats.TriggerScale.Value = false;
                 }
 
                 if (lookAtRad != 3)
@@ -355,11 +380,31 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void OnRotationTriggered(bool oldV, bool newV)
         {
+            //Debug.Log("ROTATION Old: " + oldV + " New: " + newV);
             if (newV)
             {
-                transform.Rotate(0f, 180f, 0f);
+                transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+            else
+            {
+                transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+        }
 
-                if (NetworkManager.Singleton.LocalClientId == 0) stats.TriggerRotation.Value = false;
+        private void OnScaleTriggered(bool oldV, bool newV)
+        {
+            //Debug.Log("SCALE Old: " + oldV + " New: " + newV);
+            if (newV)
+            {
+                var scale = transform.localScale;
+                scale.z = Mathf.Abs(scale.z);
+                transform.localScale = scale;
+            }
+            else
+            {
+                var scale = transform.localScale;
+                scale.z = -Mathf.Abs(scale.z);
+                transform.localScale = scale;
             }
         }
         #endregion
@@ -387,9 +432,9 @@ namespace Assets.Scripts.Both.Creature.Controllers
             }
 
             var direction = ((Vector2)path.vectorPath[currentWayPoint] - rigid.position).normalized;
-            stats.VectorSpeed.Value = direction * speed * Time.fixedDeltaTime;
-            rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value;
-            animator.SetFloat("speed", Mathf.Abs(stats.VectorSpeed.Value.x) + Mathf.Abs(stats.VectorSpeed.Value.y));
+            var vectorSpeed = direction * speed * Time.fixedDeltaTime;
+            rigid.velocity = vectorSpeed * stats.VectorState.Value;
+            animator.SetFloat("speed", Mathf.Abs(vectorSpeed.x) + Mathf.Abs(vectorSpeed.y));
 
             float distance = Vector2.Distance(rigid.position, path.vectorPath[currentWayPoint]);
 
@@ -420,6 +465,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             base.OnDestroy();
             stats.TriggerRotation.OnValueChanged -= OnRotationTriggered;
+            stats.TriggerScale.OnValueChanged -= OnScaleTriggered;
             StopAllCoroutines();
         }
     }

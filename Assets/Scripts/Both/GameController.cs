@@ -144,7 +144,7 @@ public class GameController : NetworkBehaviour
                 TargetClientIds = new ulong[] { clientId }
             }
         };
-        SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, clientRpcParams);
+        SpawnCameraClientRpc((rs as NetworkBehaviour).NetworkObject, scriptCtrl.NetworkObject, clientRpcParams);
 
         try
         {
@@ -346,7 +346,7 @@ public class GameController : NetworkBehaviour
     /// </summary>
     /// <param name="clientRpcParams"></param>
     [ClientRpc]
-    private void SpawnCameraClientRpc(NetworkObjectReference player, ClientRpcParams clientRpcParams = default)
+    private void SpawnCameraClientRpc(NetworkObjectReference player, NetworkObjectReference control, ClientRpcParams clientRpcParams = default)
     {
         if (IsClient)
         {
@@ -378,13 +378,43 @@ public class GameController : NetworkBehaviour
 
             var skillUI = FindObjectsOfType(typeof(SkillUI));
             var skills = playerObj.GetComponentsInChildren<SkillActive>();
+            control.TryGet(out NetworkObject controlObj);
             
             for (int i = 0; i < skillUI.Length; i++)
             {
-                //Debug.Log(skiccllUI[i].name);
-                (skillUI[i] as SkillUI).Setup(skills[int.Parse(skillUI[i].name)]);
+                //Debug.Log(skillUI[i].name);
+                (skillUI[i] as SkillUI).Setup(skills[int.Parse(skillUI[i].name)], controlObj.GetComponent<PlayerControl>(), int.Parse(skillUI[i].name)); //FindObjectsOfType are not sequential -> int.Parse(skillUI[i].name)
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestPlayerControlIdServerRpc(NetworkObjectReference player, ServerRpcParams serverRpcParams = default) //All PlayerController call this, get control to get Axis vector
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        player.TryGet(out NetworkObject playerObj);
+        var clientId = NetworkListener.Lobby.Keys.ElementAt(characters.IndexOf(playerObj.GetComponent<ICreature>()));
+
+        Debug.Log("RequestPlayerControlIdServerRpc " + serverRpcParams.Receive.SenderClientId + "->" + clientId);
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { serverRpcParams.Receive.SenderClientId }
+            }
+        };
+
+        ResponsePlayerControlIdClientRpc(playerObj, clientId, clientRpcParams);
+    }
+
+    [ClientRpc]
+    private void ResponsePlayerControlIdClientRpc(NetworkObjectReference player, ulong clientId, ClientRpcParams clientRpcParams = default)
+    {
+        if (NetworkManager.Singleton.IsServer) return;
+
+        player.TryGet(out NetworkObject playerObj);
+        playerObj.GetComponent<PlayerController>().ResponsePlayerControlId(clientId);
     }
 
     [ClientRpc]
