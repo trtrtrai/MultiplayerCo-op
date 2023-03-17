@@ -61,6 +61,7 @@ namespace Assets.Scripts.Server.Creature
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
 
                 SetDamage(creature, attacker.transform.localPosition, damage);
+                if (creature.Form == CreatureForm.Boss) return;
                 (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, atkerRigid.mass*2, .75f);
             }         
         }

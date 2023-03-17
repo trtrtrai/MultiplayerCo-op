@@ -207,7 +207,7 @@ public class GameController : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void CreatureSpawnClientRpc(CreatureForm form, string cName, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
+    private void CreatureSpawnClientRpc(CreatureForm form, string cName, string tag, NetworkObjectReference creature, ClientRpcParams clientRpcParams = default)
     {
         if (!IsClient || IsHost) return;
 
@@ -244,7 +244,9 @@ public class GameController : NetworkBehaviour
         attackable.Skills = skills;
         builder.InitAttack(attackable);
 
-        CreatureSetup(builder as Creature, creatureObj.tag);
+        Debug.Log(cName + " " + tag);
+        
+        CreatureSetup(builder as Creature, tag);
     }
 
     /// <summary>
@@ -423,6 +425,8 @@ public class GameController : NetworkBehaviour
         if (!IsClient) return;
 
         GameObject.Find("Loading").SetActive(false);
+        var script = GameObject.Find("Canvas").GetComponentInChildren<WaitToPlayHolder>();
+        script.Setup();
     }
 
     private void OnBossDeath()
@@ -535,7 +539,7 @@ public class GameController : NetworkBehaviour
             CreatureSetup(creatureObj, tag);
 
             //Debug.Log(netObj.name + " " + netObj.transform.localPosition);
-            CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, creatureObj.NetworkObject);
+            CreatureSpawnClientRpc(creatureObj.Form, creatureObj.Name, tag, creatureObj.NetworkObject);
         }
     }
 

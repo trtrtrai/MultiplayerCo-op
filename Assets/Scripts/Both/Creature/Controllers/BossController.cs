@@ -65,8 +65,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
-            //stats.VectorState.Value = Vector2.one;
-            //stats.TriggerScale.Value = transform.localScale.x < 0 ? true : false;
+            stats.VectorState.Value = Vector2.one;
 
             target = FindCharacter();
 
@@ -119,11 +118,6 @@ namespace Assets.Scripts.Both.Creature.Controllers
         // Update is called once per frame
         void FixedUpdate()
         {
-            if (!IsHost && IsClient)
-            {
-                //rigid.velocity = stats.VectorSpeed.Value * stats.VectorState.Value; //only Client
-            }
-
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             if (!target)

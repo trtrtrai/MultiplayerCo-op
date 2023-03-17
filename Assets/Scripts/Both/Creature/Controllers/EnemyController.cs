@@ -1,4 +1,5 @@
 using Assets.Scripts.Both.Creature.Attackable;
+using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
 using Pathfinding;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private Animator animator;
         [SerializeField] private Rigidbody2D rigid;
         [SerializeField] private Transform target;
+        [SerializeField] private NetworkStats stats;
         [SerializeField] private int speed;
         [SerializeField] private float nextWayPointDistance = .5f;
         Path path;
@@ -27,12 +29,13 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         private void Awake()
         {
-            if (NetworkManager.Singleton.LocalClientId != 0) return;
-
             animator = GetComponent<Animator>();
             creature = GetComponent<Creature>();   
 
             rigid = GetComponent<Rigidbody2D>();
+            stats = GetComponentInChildren<NetworkStats>();
+
+            if (NetworkManager.Singleton.LocalClientId != 0) return;
             seeker = GetComponent<Seeker>();
 
             target = FindCharacter();
@@ -40,6 +43,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
         void Start()
         {
+            stats.TriggerScale.OnValueChanged += OnScaleTriggered;
+
             if (NetworkManager.Singleton.LocalClientId != 0) return;
 
             speed = creature.GetStats(StatsType.Speed).GetValue();
@@ -107,11 +112,32 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             if (rigid.velocity.x > 0.01f)
             {
-                transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
+                scale.x = Mathf.Abs(scale.x);
+                transform.localScale = scale;
+                stats.TriggerScale.Value = false; // depennd on initial animation of creatures, default is right (xAxis > 0f) <=> bool default (false)
             }
             else if (rigid.velocity.x < -0.01f)
             {
-                transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, scale.z);
+                scale.x = -Mathf.Abs(scale.x);
+                transform.localScale = scale;
+                stats.TriggerScale.Value = true;
+            }
+        }
+
+        private void OnScaleTriggered(bool oldV, bool newV)
+        {
+            //Debug.Log("SCALE Old: " + oldV + " New: " + newV);
+            if (newV)
+            {
+                var scale = transform.localScale;
+                scale.x = -Mathf.Abs(scale.x); // change depend on AnimationUpdate
+                transform.localScale = scale;
+            }
+            else
+            {
+                var scale = transform.localScale;
+                scale.x = Mathf.Abs(scale.x);
+                transform.localScale = scale;
             }
         }
 
@@ -174,5 +200,11 @@ namespace Assets.Scripts.Both.Creature.Controllers
             currentWayPoint = 0;
         }
         #endregion
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            stats.TriggerScale.OnValueChanged -= OnScaleTriggered;
+        }
     }
 }

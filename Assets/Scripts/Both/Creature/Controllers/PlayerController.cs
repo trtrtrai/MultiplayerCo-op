@@ -236,6 +236,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             base.OnDestroy();
             StopAllCoroutines();
+            stats.Speed.OnValueChanged -= Speed_ValueChange;
+            (creature as Creature).StatsChange -= Speed_StatsChange;
             control.AttackTrigger.OnValueChanged -= AttackTrigger_OnValueChange;
             control.SpAttackTrigger.OnValueChanged -= SpAttackTrigger_OnValueChange;
             control.SpAttackTrigger2.OnValueChanged -= SpAttackTrigger2_OnValueChange;
