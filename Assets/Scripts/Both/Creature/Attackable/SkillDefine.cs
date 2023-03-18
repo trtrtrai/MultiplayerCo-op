@@ -15,7 +15,8 @@ namespace Assets.Scripts.Both.Creature.Attackable
         TeleDash,
         Sword,
         EnergyBall,
-        HealingZone
+        HealingZone,
+        TreeLifeSteal
     }
 
     public enum TagType

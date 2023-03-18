@@ -27,14 +27,14 @@ namespace Assets.Scripts.Server.Creature
             }
         }
 
-        public void DamageTo(ICreature creature, NetworkObject attacker, int damage) // if attacker is destroyed -> cannot calc????
+        public int DamageTo(ICreature creature, NetworkObject attacker, int damage) // if attacker is destroyed -> cannot calc????
         {
-            if (creature is null || attacker is null) return;
+            if (creature is null || attacker is null) return 0;
 
             var immuns = (creature as Both.Creature.Creature).GetComponents<ImmunStats>().ToList();
             foreach (var item in immuns)
             {
-                if (item.Type == StatsType.Health) return;
+                if (item.Type == StatsType.Health) return 0;
             }
 
             if (attacker.tag.Equals("Bullet"))
@@ -61,9 +61,11 @@ namespace Assets.Scripts.Server.Creature
                 damage -= creature.GetStats(StatsType.Defense).GetValue() / 2;
 
                 SetDamage(creature, attacker.transform.localPosition, damage);
-                if (creature.Form == CreatureForm.Boss) return;
+                if (creature.Form == CreatureForm.Boss) return damage;
                 (creature as Both.Creature.Creature).AddComponent<Knockback>().Setup((atker as Both.Creature.Creature).transform.localPosition, atkerRigid.mass*2, .75f);
-            }         
+            }
+
+            return damage;
         }
 
         public void TouchTo(ICreature creature, NetworkObject attacker, int damage)

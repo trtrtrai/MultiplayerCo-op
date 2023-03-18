@@ -1,6 +1,4 @@
 using Assets.Scripts.Both.Creature;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,8 +11,14 @@ namespace Assets.Scripts.Server.Creature.Attackable
     {
         public ICreature Owner;
 
+        private void Start()
+        {
+            
+        }
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
+            if (!enabled) return;
             if (collision.gameObject is null || Owner is null) return;
             //Debug.Log(collision.gameObject.name + " " + collision.collider.name);
             if (!collision.gameObject.name.Equals(collision.collider.name)) return; //only accept collider in parent, not child

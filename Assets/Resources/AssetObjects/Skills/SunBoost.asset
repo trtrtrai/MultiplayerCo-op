@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SkillName: 8
   Description: Sunlight boost status for tree (maybe).
-  Range: -1
+  Range: 0
   CastDelay: 0.5
   Cooldown: 22
   SkillTags:
@@ -25,8 +25,13 @@ MonoBehaviour:
     Duration: 15
     EffectNumber: 0.75
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 1
     SPlace: 0
     SummonCreature: 
@@ -40,8 +45,13 @@ MonoBehaviour:
     Duration: 15
     EffectNumber: 0.5
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 3
     SPlace: 0
     SummonCreature: 
@@ -55,8 +65,13 @@ MonoBehaviour:
     Duration: 15
     EffectNumber: 1
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 4
     SPlace: 0
     SummonCreature: 

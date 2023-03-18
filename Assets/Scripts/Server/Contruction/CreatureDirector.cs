@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Server.Contruction
 {
-    public class CreatureDirector : NetworkBehaviour
+    public class CreatureDirector : MonoBehaviour
     {
         public static CreatureDirector Instance { get; private set; }
 

@@ -7,6 +7,11 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
     {
         [SerializeField] private IActiveDetect parent;
 
+        private void Start()
+        {
+            
+        }
+
         public void Setup(IActiveDetect skill)
         {
             parent = skill;
@@ -14,7 +19,9 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
+            if (!enabled) return;
             if (collision.gameObject is null) return;
+            if (!collision.gameObject.name.Equals(collision.collider.name)) return; //only accept collider in parent, not child
 
             //Debug.Log(collision.gameObject.name);
 
@@ -23,6 +30,7 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (!enabled) return;
             if (collision.gameObject is null) return;
 
             //Debug.Log(collision.gameObject.name);

@@ -1,10 +1,8 @@
 using Assets.Scripts.Both.Scriptable;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Both
 {
@@ -92,8 +90,7 @@ namespace Assets.Scripts.Both
                                     var gameCtroller = Instantiate(Resources.Load<GameObject>("Manager/GameController"));
                                     GameController.Instance.SpawnGameObject(gameCtroller, true);
 
-                                    var creatureContruct = GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
-                                    GameController.Instance.SpawnGameObject(creatureContruct, true);
+                                    GameController.Instance.InstantiateGameObject("Manager/CreatureConstruction", null);
 
                                     GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
                                     GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);

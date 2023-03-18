@@ -169,9 +169,9 @@ public class GameController : NetworkBehaviour
         SkillBehaviour.Instance.Cast(skillTags, args);
     }
 
-    public void Damage(ICreature target, NetworkObject attacker, int damage)
+    public int Damage(ICreature target, NetworkObject attacker, int damage)
     {
-        DamageCalculate.Instance.DamageTo(target, attacker, damage);
+        return DamageCalculate.Instance.DamageTo(target, attacker, damage);
     }
 
     public bool? CreatureTagDetect(string ownerTag, string collisionTag)

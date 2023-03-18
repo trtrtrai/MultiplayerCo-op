@@ -1,10 +1,7 @@
 using Assets.Scripts.Both.Creature;
-using Assets.Scripts.Both.Creature.Player;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
-using System;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Contruction
@@ -12,7 +9,7 @@ namespace Assets.Scripts.Server.Contruction
     /// <summary>
     /// Server-side execute
     /// </summary>
-    public class CreatureFactory : NetworkBehaviour
+    public class CreatureFactory : MonoBehaviour
     {
         public static CreatureFactory Instance { get; private set; }
 

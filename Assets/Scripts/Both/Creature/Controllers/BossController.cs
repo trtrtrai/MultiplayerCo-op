@@ -1,6 +1,8 @@
 using Assets.Scripts.Both.Creature.Attackable;
+using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
+using Assets.Scripts.Server.Creature.Attackable;
 using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +19,8 @@ namespace Assets.Scripts.Both.Creature.Controllers
         [SerializeField] private Rigidbody2D rigid;
         [SerializeField] private Transform target;
         [SerializeField] private NetworkStats stats;
+        [SerializeField] private TouchDamageDetect touchDetect;
+        [SerializeField] private SkillDetect skillDetect;
         [SerializeField] private int speed;
         [SerializeField] private float nextWayPointDistance = .5f;
         Path path;
@@ -45,6 +49,20 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             if (NetworkManager.Singleton.LocalClientId != 0) return;
             seeker = GetComponent<Seeker>();
+            touchDetect = GetComponent<TouchDamageDetect>();
+            StartCoroutine(SkillDetectCatcher());
+        }
+
+        IEnumerator SkillDetectCatcher()
+        {
+            while (skillDetect is null)
+            {
+                skillDetect = GetComponent<SkillDetect>();
+
+                yield return null;
+            }
+
+            skillDetect.enabled = false;
         }
 
         public void MoveNonAffect()
@@ -79,21 +97,18 @@ namespace Assets.Scripts.Both.Creature.Controllers
             (creature as Creature).StatsChange += (o, a) => { 
                 if (a.Type.Name.Equals(StatsType.Health.ToString())) currentHealth = a.NewValue; 
 
-                if (a.OldValue > a.NewValue)
+                if (a.Type.Name.Equals(StatsType.Health.ToString()) && a.OldValue > a.NewValue)
                 {
                     var rand = Random.Range(0f, 1f);
-                    if (rand <= 0.3f)
+                    if (rand <= 0.3f) // 30% change target if it be attacked
                     {
                         Debug.Log("Follow other target");
                         target = FindCharacter();
                     }
                 }
-
-                if (a.NewValue < limitChange)
-                {
-                    Transformer();
-                }
             };
+
+            (creature as Creature).StatsChange += BossController_HealthChange;
 
             //Setup skill choice
             skills = creature.GetSkills();
@@ -115,6 +130,20 @@ namespace Assets.Scripts.Both.Creature.Controllers
             InvokeRepeating("UpdatePath", 0f, 0.5f);
         }
 
+        private void BossController_HealthChange(object sender, StatsChangeEventArgs args)
+        {
+            if (!args.Type.Name.Equals(StatsType.Health.ToString())) return;
+
+            if (args.NewValue < limitChange)
+            {
+                Transformer();
+            }
+            else if (animator.GetBool("isTransformer") && args.NewValue >= limitChange + 200)
+            {
+                DeTransformer();
+            }
+        }
+
         // Update is called once per frame
         void FixedUpdate()
         {
@@ -132,7 +161,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
             //Skill active timer
             if (timer > 0)
             {
-                timer -= Time.fixedDeltaTime;
+                timer -= Time.fixedDeltaTime / 2;
             }
 
             //Animation
@@ -158,14 +187,14 @@ namespace Assets.Scripts.Both.Creature.Controllers
         {
             if (skillQueue.Count <= 5)
             {
-                var addAmount = Random.Range(15, 21);
-
+                var addAmount = Random.Range(15, 21); // add 15-20 skill into queue
+                var isT = animator.GetBool("isTransformer");
                 for (int i = 0; i < addAmount; i++)
                 {
                     var skillNum = Random.Range(0, 1000);
 
-                    if (currentHealth <= limitChange) skillQueue.Enqueue(skills.Count - 1);
-                    else skillQueue.Enqueue(skillNum % (skills.Count - 1)); // last skill is after transformer
+                    if (isT) skillQueue.Enqueue(skills.Count - 2); // check transformer
+                    else skillQueue.Enqueue(skillNum % (skills.Count - 2)); // except last skill is after transformer
                 }
             }
         }
@@ -176,6 +205,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
 
             FillSkillQueue(); // <=5 count --> fill
 
+            // Check current skill can active? if not --> pass
             int limit = 5;
             while (limit != 0 && !skillActivable[skillQueue.Peek()])  //if Peek() activable is false -> turn it to last queue
             {
@@ -184,7 +214,7 @@ namespace Assets.Scripts.Both.Creature.Controllers
                 limit--;
             }
 
-            timer = Random.Range(1.5f, 3f); //new timer
+            timer = Random.Range(0.75f, 1.25f); //new timer
         }
 
         private void ActiveSkillQueue()
@@ -241,23 +271,43 @@ namespace Assets.Scripts.Both.Creature.Controllers
         void Transformer() //Treant: Transformerrrrrrrr
         {
             //animation parameter "isTransformer"
+            animator.SetBool("isTransformer", true);
+            touchDetect.enabled = false;
+            skillDetect.enabled = true;
             skillQueue.Clear();
             FillSkillQueue();
-            animator.SetBool("isTransformer", true);
-            StartCoroutine(Wait());
+            //StartCoroutine(Wait());
         }
 
-        IEnumerator Wait()
+        void DeTransformer()
+        {
+            //animation parameter "isTransformer"
+            animator.SetBool("isTransformer", false);
+            skillDetect.enabled = false;
+            touchDetect.enabled = true;
+            skillQueue.Clear();
+            FillSkillQueue();
+        }
+
+        /*IEnumerator Wait()
         {
             yield return new WaitForSeconds(0.25f);
 
             animator.SetBool("isTransformer", false);
-        }
+        }*/
 
-        void SpecialAttack() //Treant: SunBoost
+        void SpecialAttack() //Treant: TreeLifeSteal
         {
             skillActivable[3] = false;
-            creature.ActivateSkill(3, () => { skillActivable[3] = true; }, transform);
+            creature.ActivateSkill(3, () => { skillActivable[3] = true; }, target);
+
+            NextSkill();
+        }
+
+        void Boost() //Treant: SunBoost - active special, don't in queue
+        {
+            skillActivable[4] = false;
+            creature.ActivateSkill(4, () => { skillActivable[4] = true; }, transform);
 
             NextSkill();
         }
@@ -416,6 +466,11 @@ namespace Assets.Scripts.Both.Creature.Controllers
             else
             {
                 reachedEndOfPath = false;
+            }
+
+            if (animator.GetBool("isTransformer") && skillActivable[4])
+            {
+                Boost();
             }
 
             if (/*skillQueue.Count != 0 &&*/ (skills[skillQueue.Peek()].Range == -1f || Vector2.Distance((Vector2)target.localPosition, rigid.position) <= skills[skillQueue.Peek()].Range))

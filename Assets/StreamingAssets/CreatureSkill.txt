@@ -3,7 +3,7 @@
 "FighterSword":["Sword","Ragnarok","Dash"],
 "MagicianAttack":["EnergyBall","FireBall","TeleDash"],
 "PriestHealing":["EnergyBall","HealingZone","TeleDash"],
-"Treant":["TreeAttack","BatSummon","TriFireBall","SunBoost"],
+"Treant":["TreeAttack","BatSummon","TriFireBall","TreeLifeSteal","SunBoost"],
 "Bat":["BatBite"],
 
 }
