@@ -27,8 +27,10 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
                 Creature attacker = GetComponentInParent<Creature>();
                 //Debug.Log("Slash dame" + attacker.GetStats(Scriptable.StatsType.Strength).GetValue() + " " + obj.tag);
                 var damage = GameController.Instance.Damage(obj.GetComponent<Creature>(), attacker.NetworkObject, attacker.GetStats(Scriptable.StatsType.Strength).GetValue());
+                GameController.Instance.Log((owner as NetworkBehaviour).GetComponent<ICreature>(), damage);
 
                 DamageCalculate.Instance.BuffTo((owner as NetworkBehaviour).GetComponent<ICreature>(), damage, Scriptable.StatsType.Health);
+                GameController.Instance.Log((owner as NetworkBehaviour).GetComponent<ICreature>(), damage, false);
             }
         }
 

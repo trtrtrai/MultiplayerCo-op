@@ -41,7 +41,7 @@ public class RoomController : NetworkBehaviour
         loading = GameObject.FindGameObjectWithTag("Loading");
         loading.transform.GetChild(0).gameObject.SetActive(false);
         script = GameObject.Find("Canvas").GetComponent<RoomButton>();
-        //script.IpAddrTxt.text = GetLocalIPAddress() ?? "0.0.0.0";
+        script.IpAddrTxt.text = GetLocalIPAddress() ?? "0.0.0.0";
 
         if (!IsServer) return;
 
@@ -426,9 +426,9 @@ public class RoomController : NetworkBehaviour
         SceneManager.LoadScene("GameMenu");
     }
 
-    /*private string GetLocalIPAddress()
+    private string GetLocalIPAddress()
     {
-        if (IsServer) 
+        if (IsServer)
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -448,7 +448,7 @@ public class RoomController : NetworkBehaviour
         }
 
         return null;
-    }*/
+    }
 
     public override void OnDestroy()
     {

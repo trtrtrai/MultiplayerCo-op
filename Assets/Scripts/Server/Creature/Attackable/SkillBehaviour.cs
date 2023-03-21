@@ -209,7 +209,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                     damage += (int)tag.EffectNumber;
                 }
 
-                script.InjectBulletInfo(damage, direction, 250f, creature, tag.Duration);
+                script.InjectBulletInfo(damage, direction, 325f, creature, tag.Duration);
 
                 GameController.Instance.SpawnGameObject(bullet, true);
             }

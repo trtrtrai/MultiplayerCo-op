@@ -95,6 +95,8 @@ namespace Assets.Scripts.Both
                                     GameController.Instance.InstantiateGameObject("Manager/SkillBehaviour", null);
                                     GameController.Instance.InstantiateGameObject("Manager/DamageCalc", null);
 
+                                    GameController.Instance.InstantiateGameObject("Manager/GameLogger", null);
+
                                     var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
                                     GameController.Instance.SpawnGameObject(cmr, true);
 

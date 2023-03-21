@@ -45,7 +45,9 @@ namespace Assets.Scripts.Both.DynamicObject
             }
             else if (detectRs == true)
             {
-                GameController.Instance.Damage(collision.gameObject.GetComponent<ICreature>(), NetworkObject, damage);
+                var dmgRs = GameController.Instance.Damage(collision.gameObject.GetComponent<ICreature>(), NetworkObject, damage);
+
+                GameController.Instance.Log(owner, dmgRs);
                 BulletCollisioned();
             }
         }

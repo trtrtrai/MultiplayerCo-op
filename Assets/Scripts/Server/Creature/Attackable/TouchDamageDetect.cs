@@ -29,7 +29,8 @@ namespace Assets.Scripts.Server.Creature.Attackable
 
             if (rs == true)
             {
-                DamageCalculate.Instance.TouchTo(creature, GetComponent<NetworkObject>(), Owner.GetStats(Both.Scriptable.StatsType.Strength).GetValue() / 3);
+                var dmgRs = DamageCalculate.Instance.TouchTo(creature, GetComponent<NetworkObject>(), Owner.GetStats(Both.Scriptable.StatsType.Strength).GetValue() / 3);
+                GameController.Instance.Log(Owner, dmgRs);
             }
         }
     }

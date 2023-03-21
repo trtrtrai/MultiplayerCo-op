@@ -16,7 +16,7 @@ MonoBehaviour:
   Description: Assume opponents health for itself.
   Range: 0
   CastDelay: 0
-  Cooldown: 1
+  Cooldown: 0.02
   SkillTags:
   - Tag: 0
     Attack: 0

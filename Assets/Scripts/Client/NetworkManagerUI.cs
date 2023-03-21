@@ -40,20 +40,20 @@ namespace Assets.Scripts.Client
             btnClient.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyClient();
-                /*if (SetIpAddress())
+                if (SetIpAddress())
                 {
                     NetworkManager.Singleton.GetComponent<NetworkListener>().StartMyClient();
-                }*/
+                }
             });
         }
 
-        /*private bool SetIpAddress()
+        private bool SetIpAddress()
         {
             transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
             transport.ConnectionData.Address = ipAddrInput.text;
 
             return true;
-        }*/
+        }
 
         private void OnDestroy()
         {

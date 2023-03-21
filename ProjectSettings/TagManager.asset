@@ -76,6 +76,9 @@ TagManager:
   - name: Player
     uniqueID: 471356785
     locked: 0
+  - name: WallDown
+    uniqueID: 3015866459
+    locked: 0
   - name: Screen
     uniqueID: 2423373715
     locked: 0

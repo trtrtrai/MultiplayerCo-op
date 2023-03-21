@@ -1,10 +1,7 @@
 using Assets.Scripts.Both.Creature;
-using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.DynamicObject;
 using Assets.Scripts.Both.Scriptable;
-using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -68,14 +65,14 @@ namespace Assets.Scripts.Server.Creature
             return damage;
         }
 
-        public void TouchTo(ICreature creature, NetworkObject attacker, int damage)
+        public int TouchTo(ICreature creature, NetworkObject attacker, int damage)
         {
-            if (creature is null || attacker is null) return;
+            if (creature is null || attacker is null) return 0;
 
             var immuns = (creature as Both.Creature.Creature).GetComponents<ImmunStats>().ToList();
             foreach (var item in immuns)
             {
-                if (item.Type == StatsType.Health) return;
+                if (item.Type == StatsType.Health) return 0;
             }
 
             /*//Defense reduce
@@ -83,6 +80,7 @@ namespace Assets.Scripts.Server.Creature
 
             SetDamage(creature, attacker.transform.localPosition, damage);
             (creature as Both.Creature.Creature).AddComponent<ImmunStats>().Setup(StatsType.Health, 0.5f);
+            return damage;
         }
 
         public void BuffTo(ICreature creature, int amount, StatsType type)

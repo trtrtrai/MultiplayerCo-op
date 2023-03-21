@@ -43,6 +43,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         if (creature.tag.Equals("Character") || creature.tag.Equals("Ally"))
                         {
                             DamageCalculate.Instance.BuffTo(creature.GetComponent<ICreature>(), numberEffect, type);
+                            GameController.Instance.Log(owner, numberEffect, false);
                         }
 
                         break;
@@ -52,6 +53,7 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         if (creature.tag.Equals("Enemy") || creature.tag.Equals("Boss"))
                         {
                             DamageCalculate.Instance.BuffTo(creature.GetComponent<ICreature>(), numberEffect, type);
+                            GameController.Instance.Log(owner, numberEffect, false);
                         }        
 
                         break;

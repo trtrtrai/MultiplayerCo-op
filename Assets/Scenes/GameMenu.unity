@@ -252,7 +252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6176707758515123717, guid: 49221235376fa46db9647623eef1e998, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49221235376fa46db9647623eef1e998, type: 3}
@@ -727,11 +727,19 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 2122218959}
     - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
@@ -743,7 +751,15 @@ PrefabInstance:
       value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_BoolArgument
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5377640303764131140, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
@@ -872,7 +888,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1211,7 +1227,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5201653060648982522, guid: e1849cde3a4634459abb2ab547b31d1d, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1837,8 +1853,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1285773756}
   - {fileID: 1589030043}
+  - {fileID: 1285773756}
   - {fileID: 1077011533}
   m_Father: {fileID: 1806130695}
   m_RootOrder: 3

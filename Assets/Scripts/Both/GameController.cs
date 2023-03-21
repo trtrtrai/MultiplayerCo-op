@@ -22,6 +22,7 @@ using Assets.Scripts.Both;
 using UnityEngine.SceneManagement;
 using Assets.Scripts.Both.UIHolder;
 using System.Collections;
+using Assets.Scripts.Server.Log;
 
 /// <summary>
 /// Server owner. Communication between client and server.
@@ -31,7 +32,7 @@ public class GameController : NetworkBehaviour
     public static GameController Instance { get; private set; }
 
     private Dictionary<string, List<SkillName>> skillDict;
-    private List<ICreature> characters;
+    private Dictionary<ICreature, ulong> characters;
     public NetworkVariable<float> Timer = new NetworkVariable<float>(0);
 
     private void Awake()
@@ -148,12 +149,14 @@ public class GameController : NetworkBehaviour
 
         try
         {
-            characters.Add(rs);
+            characters.Add(rs, clientId);
+            GameLogger.Instance.AddPlayer(clientId);
         }
         catch
         {
-            characters = new List<ICreature>();
-            characters.Add(rs);
+            characters = new Dictionary<ICreature, ulong>();
+            characters.Add(rs, clientId);
+            GameLogger.Instance.AddPlayer(clientId);
         }
 
         if (characters.Count == NetworkListener.Lobby.Count)
@@ -396,7 +399,7 @@ public class GameController : NetworkBehaviour
         if (!NetworkManager.Singleton.IsServer) return;
 
         player.TryGet(out NetworkObject playerObj);
-        var clientId = NetworkListener.Lobby.Keys.ElementAt(characters.IndexOf(playerObj.GetComponent<ICreature>()));
+        var clientId = characters[playerObj.GetComponent<ICreature>()];
 
         Debug.Log("RequestPlayerControlIdServerRpc " + serverRpcParams.Receive.SenderClientId + "->" + clientId);
         ClientRpcParams clientRpcParams = new ClientRpcParams
@@ -444,7 +447,7 @@ public class GameController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (characters.Contains(creature))
+        if (characters.ContainsKey(creature))
         {
             characters.Remove(creature);
 
@@ -469,6 +472,43 @@ public class GameController : NetworkBehaviour
 
         Time.timeScale = 1f;
         ToRoomScene();
+    }
+
+    public void Log(ICreature attacker, int amount, bool isDamage = true)
+    {
+        var creatureTag = (attacker as NetworkBehaviour).tag;
+
+        switch (creatureTag)
+        {
+            case "Player":
+                {
+                    if (!characters.ContainsKey(attacker)) return;
+
+                    if (isDamage)
+                    {
+                        GameLogger.Instance.PlayerLog(characters[attacker], amount);
+                    }
+                    else
+                    {
+                        GameLogger.Instance.PlayerLog(characters[attacker], amount, false);
+                    }
+
+                    break;
+                }
+            case "Boss":
+                {
+                    if (isDamage)
+                    {
+                        GameLogger.Instance.BossLog(amount);
+                    }
+                    else
+                    {
+                        GameLogger.Instance.BossLog(amount, false);
+                    }
+
+                    break;
+                }
+        }
     }
 
     [ClientRpc]
