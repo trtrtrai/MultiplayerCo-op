@@ -33,7 +33,6 @@ public class GameController : NetworkBehaviour
 
     private Dictionary<string, List<SkillName>> skillDict;
     private Dictionary<ICreature, ulong> characters;
-    public NetworkVariable<float> Timer = new NetworkVariable<float>(0);
 
     private void Awake()
     {
@@ -436,9 +435,7 @@ public class GameController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        Time.timeScale = 0f;
-        Timer.Value = 5f;
-        StartCoroutine(WaitToReroom());
+        Time.timeScale = 0.5f;
 
         ShowResultClientRpc(true);
     }
@@ -453,25 +450,11 @@ public class GameController : NetworkBehaviour
 
             if (characters.Count == 0)
             {
-                Time.timeScale = 0f;
-                Timer.Value = 5f;
-                StartCoroutine(WaitToReroom());
+                Time.timeScale = 0.5f;
 
                 ShowResultClientRpc(false);
             }
         }
-    }
-
-    IEnumerator WaitToReroom()
-    {
-        while (Timer.Value > 0)
-        {
-            Timer.Value -= Time.fixedUnscaledDeltaTime / 2; // (1/50) / 2: two frame per 0.1s
-            yield return null;
-        }
-
-        Time.timeScale = 1f;
-        ToRoomScene();
     }
 
     public void Log(ICreature attacker, int amount, bool isDamage = true)
@@ -532,7 +515,6 @@ public class GameController : NetworkBehaviour
             script.Content.text = "All Heroes are destroyed, The Boss win.";
         }
 
-        script.StartTiming();
         script.Container.SetActive(true);
     }
 

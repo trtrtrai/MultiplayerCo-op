@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Both.UIHolder
 {
@@ -8,18 +10,12 @@ namespace Assets.Scripts.Both.UIHolder
         public GameObject Container;
         public TMP_Text Label;
         public TMP_Text Content;
-        public TMP_Text TimingText;
+        public Button ReroomBtn;
+        public List<GameObject> LeaderBoardItems;
 
-        private bool isStart;
-
-        public void StartTiming() => isStart = true;
-
-        private void Update()
+        public void OutGamePlay()
         {
-            if (!isStart) return;
-
-            var numTxt = GameController.Instance.Timer.Value <= 0 ? "0.00" : GameController.Instance.Timer.Value.ToString("F");
-            TimingText.text = "Remaining to reroom " + numTxt + "s";
+            GameController.Instance.ToRoomScene();
         }
     }
 }
