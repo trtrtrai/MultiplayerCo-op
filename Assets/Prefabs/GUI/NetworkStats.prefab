@@ -296,7 +296,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &8398652946103807302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,4 +346,10 @@ MonoBehaviour:
     m_InternalValue: 0
   MaxCriticalHit:
     m_InternalValue: 0
-  isSetup: 0
+  VectorState:
+    m_InternalValue: {x: 0, y: 0}
+  TriggerRotation:
+    m_InternalValue: 0
+  TriggerScale:
+    m_InternalValue: 0
+  IsSetup: 0

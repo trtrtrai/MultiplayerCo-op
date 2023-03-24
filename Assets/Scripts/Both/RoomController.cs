@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine.UI;
 
 public class RoomController : NetworkBehaviour
 {
@@ -198,6 +199,8 @@ public class RoomController : NetworkBehaviour
         player.ButtonContainer.SetActive(isActiveButton);
         player.OnUse = true;
         player.IsOwner = isActiveButton;
+
+        if (player.IsOwner) player.GetComponent<Image>().color = new Color(154 / 255f, 202 / 255f, 138 / 255f);
     }
     #endregion
 

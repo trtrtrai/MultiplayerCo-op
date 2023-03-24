@@ -1,10 +1,4 @@
-using Assets.Scripts.Both.Creature.Attackable;
-using Newtonsoft.Json;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Log
@@ -28,8 +22,9 @@ namespace Assets.Scripts.Server.Log
         [SerializeField] private Dictionary<ulong, int> damageDealt;
         [SerializeField] private Dictionary<ulong, int> healthHeal;
 
-        [SerializeField] private int bossDamageDealth = 0;
-        [SerializeField] private int bossHealthHeal = 0;
+        //Boss also list in future
+        [SerializeField] private int bossDamageDealth = 0; //use after
+        [SerializeField] private int bossHealthHeal = 0; //use after
 
         [SerializeField] private float timer = 0f;
 
@@ -83,6 +78,16 @@ namespace Assets.Scripts.Server.Log
                 bossHealthHeal += amount;
             }
         }
+
+        public void GetPlayerLog(out Dictionary<ulong, int> damageDealt, out Dictionary<ulong, int> healthHeal)
+        {
+            damageDealt = this.damageDealt;
+            healthHeal = this.healthHeal;
+        }
+
+        //public void GetBossLog(out int damage, out int healing)
+
+        public float GetTime() => timer;
 
         private void FixedUpdate()
         {

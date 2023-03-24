@@ -438,6 +438,7 @@ public class GameController : NetworkBehaviour
         Time.timeScale = 0.5f;
 
         ShowResultClientRpc(true);
+        SendLeaderboardInfo();
     }
 
     public void IsCharacterDeath(ICreature creature)
@@ -453,8 +454,69 @@ public class GameController : NetworkBehaviour
                 Time.timeScale = 0.5f;
 
                 ShowResultClientRpc(false);
+                SendLeaderboardInfo();
             }
         }
+    }
+
+    private void SendLeaderboardInfo()
+    {
+        Dictionary<ulong, int> damageDealt;
+        Dictionary<ulong, int> healthHeal;
+        GameLogger.Instance.GetPlayerLog(out damageDealt, out healthHeal);
+
+        SortedDictionary<float, ulong> leaderboard = new SortedDictionary<float, ulong>();
+        foreach (var item in NetworkListener.Lobby.Keys)
+        {
+            leaderboard.Add(damageDealt[item] * .75f + healthHeal[item] * 1.25f, item);
+        }
+        int i = 0;
+        foreach (var item in leaderboard)
+        {
+            Debug.Log(item.Key + "-" + item.Value);
+            ShowLeaderboadItemClientRpc(i, damageDealt[item.Value], healthHeal[item.Value]);
+            i++;
+        }
+    }
+
+    [ClientRpc]
+    private void ShowLeaderboadItemClientRpc(int index, int damage, int healing, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+
+        var script = GameObject.Find("Canvas").GetComponentInChildren<ResultPanelHolder>();
+
+        script.GetLeaderboardNameTxt(index).text = "Player" + index;
+        script.GetLeaderboardDmgTxt(index).text = damage.ToString();
+        script.GetLeaderboardHealingTxt(index).text = "" + healing;
+
+        script.ActiveLeaderboadItem(index);
+    }
+
+    [ClientRpc]
+    private void ShowResultClientRpc(bool isWin, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsClient) return;
+
+        //Stop something on Client: control,...
+        GameObject.Find("Canvas").GetComponent<GameButton>().ResetPlayerInput();
+
+        var script = GameObject.Find("Canvas").GetComponentInChildren<ResultPanelHolder>();
+
+        if (isWin)
+        {
+            script.Label.text = "congratulation";
+            script.Content.text = "The Boss is destroyed, Hero team win.";
+        }
+        else
+        {
+            script.Label.text = "mission failed";
+            script.Content.text = "All Heroes are destroyed, The Boss win.";
+        }
+
+        if (!IsHost) script.ReroomBtn.interactable = false;
+
+        script.Container.SetActive(true);
     }
 
     public void Log(ICreature attacker, int amount, bool isDamage = true)
@@ -463,7 +525,7 @@ public class GameController : NetworkBehaviour
 
         switch (creatureTag)
         {
-            case "Player":
+            case "Character":
                 {
                     if (!characters.ContainsKey(attacker)) return;
 
@@ -492,30 +554,6 @@ public class GameController : NetworkBehaviour
                     break;
                 }
         }
-    }
-
-    [ClientRpc]
-    private void ShowResultClientRpc(bool isWin, ClientRpcParams clientRpcParams = default)
-    {
-        if (!IsClient) return;
-
-        //Stop something on Client: control,...
-        GameObject.Find("Canvas").GetComponent<GameButton>().ResetPlayerInput();
-
-        var script = GameObject.Find("Canvas").GetComponentInChildren<ResultPanelHolder>();
-
-        if (isWin)
-        {
-            script.Label.text = "congratulation";
-            script.Content.text = "The Boss is destroyed, Hero team win.";
-        }
-        else
-        {
-            script.Label.text = "mission failed";
-            script.Content.text = "All Heroes are destroyed, The Boss win.";
-        }
-
-        script.Container.SetActive(true);
     }
 
     public List<SkillName> GetCreatureSkill(string name) => skillDict.ContainsKey(name) ? skillDict[name] : null;
