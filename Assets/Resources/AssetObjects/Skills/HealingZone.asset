@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: HealingZone
   m_EditorClassIdentifier: 
   SkillName: 13
-  Description: Create zone around caster to heal ally in 3.5 seconds.
+  Description: Create zone around caster to heal some health to ally.
   Range: -1
   CastDelay: 0.5
   Cooldown: 20
+  SkillIcon: {fileID: 21300000, guid: d76d32586fae1db46909433b6dce3131, type: 3}
   SkillTags:
   - Tag: 0
     Attack: 2

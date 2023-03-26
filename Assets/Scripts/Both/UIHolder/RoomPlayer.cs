@@ -19,6 +19,8 @@ public class RoomPlayer : MonoBehaviour
     public Button LeftButton;
     public Button RightButton;
 
+    public Color OwnerColor = new Color(154 / 255f, 202 / 255f, 138 / 255f, 208 / 255f);
+
     private int CharacterCount;
 
     public void Next()

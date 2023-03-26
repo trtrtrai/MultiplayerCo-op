@@ -200,7 +200,7 @@ public class RoomController : NetworkBehaviour
         player.OnUse = true;
         player.IsOwner = isActiveButton;
 
-        if (player.IsOwner) player.GetComponent<Image>().color = new Color(154 / 255f, 202 / 255f, 138 / 255f);
+        if (player.IsOwner) player.GetComponent<Image>().color = player.OwnerColor;
     }
     #endregion
 

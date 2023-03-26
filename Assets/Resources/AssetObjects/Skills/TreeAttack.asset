@@ -17,6 +17,7 @@ MonoBehaviour:
   Range: 0.75
   CastDelay: 0
   Cooldown: 2.5
+  SkillIcon: {fileID: 0}
   SkillTags:
   - Tag: 0
     Attack: 0
@@ -25,9 +26,16 @@ MonoBehaviour:
     Duration: 1
     EffectNumber: 0.33
     AddOrMultiple: 1
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 0
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0

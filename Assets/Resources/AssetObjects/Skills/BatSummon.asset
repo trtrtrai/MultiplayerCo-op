@@ -17,6 +17,7 @@ MonoBehaviour:
   Range: -1
   CastDelay: 3
   Cooldown: 20
+  SkillIcon: {fileID: 0}
   SkillTags:
   - Tag: 2
     Attack: 0
@@ -25,9 +26,13 @@ MonoBehaviour:
     Duration: 0
     EffectNumber: 0
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
     BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 0
     SPlace: 0
     SummonCreature: Bat

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: FireBall
   m_EditorClassIdentifier: 
   SkillName: 0
-  Description: Shoot a fireball on current caster's direction with 150% caster's
-    strength.
+  Description: Shoot a fireball.
   Range: -1
   CastDelay: 0
   Cooldown: 7
+  SkillIcon: {fileID: 21300000, guid: 7433652eee5bc3d4fa4ad7833a6f11e4, type: 3}
   SkillTags:
   - Tag: 0
     Attack: 1

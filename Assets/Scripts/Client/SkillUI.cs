@@ -1,5 +1,6 @@
 using Assets.Scripts.Both.Creature.Attackable.SkillExecute;
 using Assets.Scripts.Both.Creature.Controllers;
+using Assets.Scripts.Both.Scriptable;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -26,6 +27,13 @@ namespace Assets.Scripts.Client
             this.skill = skill;
             this.control = control;
             this.index = index;
+
+            var script = Resources.Load<SkillModel>("AssetObjects/Skills/" + skill.name);
+
+            if (script.SkillIcon)
+            {
+                GetComponent<Image>().sprite = script.SkillIcon;
+            }
 
             switch (this.index) 
             {

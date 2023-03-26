@@ -9,10 +9,11 @@ namespace Assets.Scripts.Both.Scriptable
     public class SkillModel : ScriptableObject
     {
         public SkillName SkillName;
-        [TextArea] public string Description;
+        [TextArea(3, 5)] public string Description;
         public float Range;
         public float CastDelay; // time delay before skill actully cast
         public float Cooldown; // time to wait for the next activate
+        public Sprite SkillIcon;
         public List<SkillTag> SkillTags;
     }
 }

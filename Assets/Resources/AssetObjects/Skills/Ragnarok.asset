@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Ragnarok
   m_EditorClassIdentifier: 
   SkillName: 1
-  Description: Apocalypse!!! Get 25pts Strength, 15pts Defense in 5 seconds and 35pts
-    Speed in 3 seconds.
+  Description: Apocalypse!!! Get 25pt of Strength, 15pt of Defense for 5s and 150pt
+    of Speed for 3.5s.
   Range: -1
   CastDelay: 0
   Cooldown: 17.5
+  SkillIcon: {fileID: 21300000, guid: cd15122eea04edf43a0622685a74fb9f, type: 3}
   SkillTags:
   - Tag: 1
     Attack: 0
@@ -26,12 +27,19 @@ MonoBehaviour:
     Duration: 5
     EffectNumber: 25
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 1
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0
   - Tag: 1
     Attack: 0
     Effect: 0
@@ -39,12 +47,19 @@ MonoBehaviour:
     Duration: 5
     EffectNumber: 15
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 2
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0
   - Tag: 1
     Attack: 0
     Effect: 0
@@ -52,9 +67,16 @@ MonoBehaviour:
     Duration: 3.5
     EffectNumber: 150
     AddOrMultiple: 0
+    IsNormal: 0
     BulletAmount: 0
+    BulletRadian: 0
     Direction: 0
+    AreaType: 0
+    ObjName: 
+    PerSeconds: 0
     StatsType: 3
-    Place: 0
+    SPlace: 0
     SummonCreature: 
     SummonAmount: 0
+    TPlace: 0
+    Distance: 0

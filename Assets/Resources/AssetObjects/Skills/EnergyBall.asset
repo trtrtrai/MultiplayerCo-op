@@ -17,6 +17,7 @@ MonoBehaviour:
   Range: -1
   CastDelay: 0
   Cooldown: 0.55
+  SkillIcon: {fileID: 21300000, guid: 7250a5ca4e58dff478eb031f6ba0d1ed, type: 3}
   SkillTags:
   - Tag: 0
     Attack: 1
