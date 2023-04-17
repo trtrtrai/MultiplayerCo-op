@@ -33,6 +33,7 @@ namespace Assets.Scripts.Both.Creature.Attackable
 
         // Effect tag
         public StatsType StatsType; // Effect tag + Self Area
+        public bool IsEver;
 
         // Special tag
         public SummonPlace SPlace; //Summon

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0622e02341875349b38397ef62ee0a6, type: 3}
+  m_Name: FireBlast
+  m_EditorClassIdentifier: 
+  SkillName: 18
+  Description: Shoot 8 fireball.
+  Range: 7
+  CastDelay: 0.25
+  Cooldown: 25
+  SkillIcon: {fileID: 0}
+  SkillTags:
+  - Tag: 0
+    Attack: 1
+    Effect: 0
+    Special: 0
+    Duration: 15
+    EffectNumber: 2
+    AddOrMultiple: 1
+    IsNormal: 0
+    BulletAmount: 8
+    BulletRadian: 45
+    Direction: 1
+    AreaType: 0
+    ObjName: FireBall
+    PerSeconds: 0
+    StatsType: 0
+    IsEver: 0
+    SPlace: 0
+    SummonCreature: 
+    SummonAmount: 0
+    TPlace: 0
+    Distance: 0

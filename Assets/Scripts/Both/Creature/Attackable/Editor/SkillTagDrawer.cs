@@ -92,6 +92,10 @@ namespace Assets.Scripts.Both.Creature.Attackable.Editor
                     property.FindPropertyRelative("StatsType"),
                     new GUIContent("Stats type"));
                 line++;
+                EditorGUI.PropertyField(new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight * line, position.size.x, EditorGUI.GetPropertyHeight(property.FindPropertyRelative("IsEver"))),
+                    property.FindPropertyRelative("IsEver"),
+                    new GUIContent("Is Ever"));
+                line++;
             }
             else if (index == 2)
             {

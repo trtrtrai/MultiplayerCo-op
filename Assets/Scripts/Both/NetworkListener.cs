@@ -9,6 +9,7 @@ namespace Assets.Scripts.Both
     public class NetworkListener : MonoBehaviour
     {
         public static Dictionary<ulong, int> Lobby;
+        public static BossName BossName;
 
         public bool StartMyServer(bool isHost)
         {
@@ -100,7 +101,7 @@ namespace Assets.Scripts.Both
                                     var cmr = GameController.Instance.InstantiateGameObject("CameraFollow", null);
                                     GameController.Instance.SpawnGameObject(cmr, true);
 
-                                    GameController.Instance.BossSpawn(BossName.Treant);
+                                    GameController.Instance.BossSpawn(BossName);
                                 }
 
                                 if (sceneEvent.SceneName.Equals("Room"))

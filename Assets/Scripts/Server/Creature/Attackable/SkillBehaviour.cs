@@ -88,9 +88,16 @@ namespace Assets.Scripts.Server.Creature.Attackable
                         break;
                     }
             }
-            
-            var obj = Instantiate(Resources.Load<GameObject>("DynamicObject/StatsTemp"), cont);
-            obj.AddComponent<TemporaryStats>().Setup(creature, tag.StatsType, effNum, tag.Duration);
+
+            if (!tag.IsEver)
+            {
+                var obj = Instantiate(Resources.Load<GameObject>("DynamicObject/StatsTemp"), cont);
+                obj.AddComponent<TemporaryStats>().Setup(creature, tag.StatsType, effNum, tag.Duration);
+            }
+            else
+            {
+                creature.GetStats(tag.StatsType).SetValue(effNum);
+            }
         }
 
         private void AttackTypeBehaviour(SkillTag tag, SkillPackageEventArg args)

@@ -11,6 +11,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine.UI;
+using Assets.Scripts.Both.UIHolder;
+using Assets.Scripts.Both.Scriptable;
 
 public class RoomController : NetworkBehaviour
 {
@@ -44,7 +46,11 @@ public class RoomController : NetworkBehaviour
         script = GameObject.Find("Canvas").GetComponent<RoomButton>();
         script.IpAddrTxt.text = GetLocalIPAddress() ?? "0.0.0.0";
 
-        if (!IsServer) return;
+        if (!IsServer) 
+        {
+            script.DisableBossChoice();
+            return;
+        }
 
         if (lobby is null) lobby = new Dictionary<ulong, int>();
 
@@ -393,6 +399,22 @@ public class RoomController : NetworkBehaviour
         if (IsServer) return;
 
         loading.transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+    [ServerRpc]
+    public void BossChoiceServerRpc(int index, ServerRpcParams serverRpcParams = default)
+    {
+        if (!IsServer) return;
+
+        BossChoiceClientRpc(index);
+    }
+
+    [ClientRpc]
+    private void BossChoiceClientRpc(int index, ClientRpcParams clientRpcParams = default)
+    {
+        if (IsServer) return;
+
+        script.Script.Select(script.Script.ListBossBtn[index]);
     }
 
     public void StartGame()

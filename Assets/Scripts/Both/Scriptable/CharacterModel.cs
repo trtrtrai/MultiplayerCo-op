@@ -14,7 +14,7 @@ namespace Assets.Scripts.Both.Scriptable
         FighterSword_model,
         /*FighterSpear_model,*/
         MagicianAttack_model,
-        /*MagicianSummon_model,*/
+        MagicianSummon_model,
         PriestHealing_model,
     }
 

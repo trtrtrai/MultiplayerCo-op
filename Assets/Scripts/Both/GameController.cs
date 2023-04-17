@@ -272,17 +272,17 @@ public class GameController : NetworkBehaviour
                 }
             case "Enemy":
                 {
-                    obj.AddComponent<EnemyController>();
+                    obj.AddComponent<OtherController>();
                     break;
                 }
             case "Ally":
                 {
-
+                    obj.AddComponent<OtherController>();
                     break;
                 }
             case "Mobs":
                 {
-
+                    obj.AddComponent<OtherController>();
                     break;
                 }
         }

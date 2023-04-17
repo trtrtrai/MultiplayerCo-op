@@ -53,17 +53,20 @@ namespace Assets.Scripts.Both.Creature.Attackable.SkillExecute
 
         private IEnumerator DelayActive(Action callback)
         {
-            if (skillTags[0].Tag == TagType.Special && skillTags[0].Special == SpecialTag.Summon)
+            if (skillTags[0].Tag == TagType.Special && skillTags[0].Special == SpecialTag.Summon) //not sure it's in index 0
             {
-                var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creatureSkill.SkillName.ToString(), null);
-                if (skillObj != null && current.Target != null)
+                //if (gameObject.transform.parent.tag.Equals("Boss"))
                 {
-                    var position = FindSpawningPlace(current.Target.transform).localPosition;
-                    skillObj.transform.localPosition = position;
-                    current = new SkillPackageEventArg(current.Caster, current.Target, position);
-                    GameController.Instance.SpawnGameObject(skillObj, true);
-                    skillObj.AddComponent<AutoDestroy>().Setup(creatureSkill.CastDelay + .5f);
-                }      
+                    var skillObj = GameController.Instance.InstantiateGameObject("SkillEffect/" + creatureSkill.SkillName.ToString(), null);
+                    if (skillObj != null && current.Target != null)
+                    {
+                        var position = skillTags[0].SPlace == SummonPlace.Position ? FindSpawningPlace(current.Target.transform).localPosition : current.Caster.localPosition;
+                        skillObj.transform.localPosition = position;
+                        current = new SkillPackageEventArg(current.Caster, current.Target, position);
+                        GameController.Instance.SpawnGameObject(skillObj, true);
+                        skillObj.AddComponent<AutoDestroy>().Setup(creatureSkill.CastDelay + .5f);
+                    }
+                }  
             }
 
             yield return new WaitForSeconds(creatureSkill.CastDelay);

@@ -16,7 +16,14 @@ namespace Assets.Scripts.Both.Creature.Attackable
         Sword,
         EnergyBall,
         HealingZone,
-        TreeLifeSteal
+        TreeLifeSteal,
+        PetRelease,
+        RockImpact,
+        ScorpionSummon,
+        FireBlast,
+        RockSmash,
+        RockRebuild,
+        ScorpionFang,
     }
 
     public enum TagType

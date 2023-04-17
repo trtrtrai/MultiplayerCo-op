@@ -3,7 +3,9 @@
 "FighterSword":["Sword","Ragnarok","Dash"],
 "MagicianAttack":["EnergyBall","FireBall","TeleDash"],
 "PriestHealing":["EnergyBall","HealingZone","TeleDash"],
+"MagicianSummon":["EnergyBall","PetRelease","TeleDash"],
 "Treant":["TreeAttack","BatSummon","TriFireBall","TreeLifeSteal","SunBoost"],
+"Golem":["RockImpact","ScorpionSummon","FireBlast","RockSmash","RockRebuild"],
 "Bat":["BatBite"],
-
+"Scorpion":["ScorpionFang"],
 }

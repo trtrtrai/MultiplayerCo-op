@@ -379,7 +379,7 @@ MonoBehaviour:
   data: 0
   entries:
   - Language: Vietnamese
-    Text: "Trang ch\u1EE7"
+    Text: "Trang ch\xEDnh"
     Object: {fileID: 0}
   - Language: English
     Text: Main menu
@@ -3430,7 +3430,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1678480506
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3506,7 +3506,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1798260907
 RectTransform:
   m_ObjectHideFlags: 0

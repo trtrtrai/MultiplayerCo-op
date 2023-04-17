@@ -1,11 +1,9 @@
 using Assets.Scripts.Both.Creature.Attackable;
-using Assets.Scripts.Both.Creature.Boss;
 using Assets.Scripts.Both.Creature.Status;
 using Assets.Scripts.Both.Scriptable;
 using Assets.Scripts.Server.Contruction.Builders;
 using System;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Assets.Scripts.Server.Contruction
@@ -102,7 +100,7 @@ namespace Assets.Scripts.Server.Contruction
             builder.GiveAttackable(attackable);
 
             // Limit change only boss
-            (builder as BossBuilder).Setup(script.changeLimit);
+            (builder as BossBuilder).Setup(script.ChangeLimit);
         }
 
         public void OtherBuild(string cName)
